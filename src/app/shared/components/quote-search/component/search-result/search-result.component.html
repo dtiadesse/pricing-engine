@@ -1,0 +1,31 @@
+<div class="mf-search-result-container" [ngSwitch]="resultType">
+    <ng-container *ngSwitchCase="'quote'">
+        <span id="quoteId" class="mf body-medium w600">Q{{ quote.quoteId }}</span>
+        <span id="typeDetails" class="mf body-medium">{{ quote.quoteType }} / {{ quote.statusType }}</span
+      >
+    </ng-container>
+    <ng-container *ngSwitchCase="'opportunity'">
+      <span class="mf body-medium"
+        ><span id="opportunityId" class="mf body-medium w600">O{{ opportunityId }}</span> /
+        <span id="quoteId">Q{{ quote.quoteId }}</span></span>
+        <span id="typeDetails" class="mf body-medium">{{ quote.quoteType }} / {{ quote.statusType }}</span
+      >
+    </ng-container>
+    <ng-container *ngSwitchCase="'loan'">
+      <span class="mf body-medium"
+        ><span id="loanId" class="mf body-medium w600">L{{ loanId }}</span> /
+        <span id="quoteId">Q{{ quote.quoteId }}</span></span>
+        <span id="typeDetails" class="mf body-medium">{{ quote.quoteType }} / {{ quote.statusType }}</span
+      >
+    </ng-container>
+    <ng-container *ngSwitchCase="'property'">
+      <span class="mf body-medium"
+        ><span id="propertyName" class="mf body-medium w600">{{ propertyName }}</span> /
+        <span id="quoteId">Q{{ quote.quoteId }}</span></span>
+        <span id="typeDetails" class="mf body-medium">{{ quote.quoteType }} / {{ quote.statusType }}</span
+      >
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <span class="mf body-medium w600">Unknown Search Result Type: {{ resultType }}</span>
+    </ng-container>
+</div>

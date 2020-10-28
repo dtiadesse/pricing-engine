@@ -1,0 +1,156 @@
+<div class="mf-table-container"
+    [ngClass]="{ 'elevated': tableOptions?.elevatedTable, 'mf-flex-table': tableOptions?.flexColumns }">
+    <table mat-table [trackBy]="identify" [id]="id"
+        [ngClass]="{ 'mf-paginated-table': tableOptions?.pagination, 'mf-condensed-rows': tableOptions?.rowHeightStyle === 'condensed', 'mf-highly-condensed-rows': tableOptions?.rowHeightStyle === 'highly-condensed', 'mf-flex-columns': tableOptions?.flexColumns, 'mf-zebra-striped-table': tableOptions?.zebraStripedTable }"
+        [dataSource]="dataSource" multiTemplateDataRows matSort>
+        <!-- SELECTION COLUMN (only shown if user enables the selection feature) -->
+        <ng-container *ngIf="allowRowSelection" matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox [id]="id + '-masterSelectionCheckBox'" [name]="'masterSelectionCheckBox'" color="primary"
+                    disableRipple="true" (change)="$event ? masterToggle($event) : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" aria-label="Select/Deselect All">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row; let i = dataIndex;">
+                <mat-checkbox [id]="id + '-rowSelectionCheckBox' + i" [name]="'rowSelectionCheckBox' + i"
+                    color="primary" disableRipple="true" (click)="$event.stopPropagation()"
+                    (change)="$event ? rowToggle($event, row) : null" [checked]="selection.isSelected(row)"
+                    [disabled]="isSelectionDisabled(i)" [aria-label]="'Select/Deselect Row ' + i">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+        <!-- ALL COLUMNS -->
+        <ng-container *ngFor="let column of tableOptions?.columns" [matColumnDef]="column.key">
+            <th mat-header-cell [ngClass]="column.cellTemplateClassName" *matHeaderCellDef>
+                <ng-container *ngIf="column.sortable || column.filterable; else defaultColumn">
+                    <div class="column-header-content" [ngClass]="{ 'column-menu-open' : column.menuOpened }"
+                        [matMenuTriggerFor]="columnMenu" [matMenuTriggerData]="{ column: column }"
+                        (menuOpened)="column.menuOpened = true" (menuClosed)="column.menuOpened = false">
+                        <span class="column-header-display-name mf w600"
+                            [ngClass]="{ 'right': column.cellValueType !== 'number' && !column.cellValueType.includes('str') }">{{column.displayName}}</span>
+                        <mat-icon class="column-header-icon" color="primary" inline="true">unfold_more</mat-icon>
+                    </div>
+                </ng-container>
+                <ng-template #defaultColumn>
+                    <div class="column-header-content">
+                        <span class="column-header-display-name mf w600"
+                            [ngClass]="{ 'right': column.cellValueType !== 'number' && !column.cellValueType.includes('str') && !column.cellValueType.includes('date') }">{{column.displayName}}</span>
+                    </div>
+                </ng-template>
+                <mat-menu #columnMenu="matMenu" class="column-menu elevated" yPosition="below">
+                    <ng-template matMenuContent let-column="column">
+                        <!-- COLUMN FILTER -->
+                        <ng-container *ngIf="column.filterable">
+                            <div class="column-menu-filter">
+                                <mat-form-field class="mf-form-field mf-remove-pb" [floatLabel]="'always'"
+                                    (click)="$event.stopPropagation()">
+                                    <mat-label>Filter</mat-label>
+                                    <input matInput #filterMenuInput [id]="column.key + '-filter-menu-input'"
+                                        placeholder="Enter filter text" [(ngModel)]="column.filterValue"
+                                        (change)="applyColumnFilter($event, column.key)">
+                                    <mat-icon matSuffix class="material-icons-outlined"
+                                        (click)="clearColumnFilter(filterMenuInput)">
+                                        cancel</mat-icon>
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="column.showFilterOptions" class="column-menu-filter-options">
+                                <mat-grid-list cols="2" rowHeight="32px">
+                                    <mat-grid-tile *ngFor="let option of column.filterOptions; let i = index;"
+                                        [colspan]="1" [rowspan]="1">
+                                        <mat-checkbox *ngIf="!!option.value" [id]="column.key + '-filter-option' + i"
+                                            class="mf-checkbox" color="primary" [name]="option.name"
+                                            [value]="option.value" [checked]="option.checked" disableRipple="true"
+                                            (click)="$event.stopPropagation()"
+                                            (change)="onFilterOptionChange($event, column.key)">
+                                            <span class="checkbox-text-wrapper" [matTooltip]="option.value"
+                                                [matTooltipClass]="'mf-tooltip'"
+                                                aria-label="Filter option checkbox label that displays a tooltip when focused or hovered over"
+                                                mfPeShowTooltipIfTruncated>{{ option.value }}</span>
+                                        </mat-checkbox>
+                                    </mat-grid-tile>
+                                </mat-grid-list>
+                            </div>
+                        </ng-container>
+                        <!-- COLUMN SORT -->
+                        <div *ngIf="column.sortable" class="column-menu-sort">
+                            <span class="column-menu-sort-label">Sort by</span>
+                            <span class="column-menu-sort-icons">
+                                <button mat-icon-button aria-label="Sort ascending button" color="accent"
+                                    (click)="$event.stopPropagation(); sortColumn(column.key, 'asc')">
+                                    <mat-icon>arrow_upward</mat-icon>
+                                </button>
+                                <button mat-icon-button aria-label="Sort descending button" color="accent"
+                                    (click)="$event.stopPropagation(); sortColumn(column.key, 'desc')">
+                                    <mat-icon>arrow_downward</mat-icon>
+                                </button>
+                            </span>
+                        </div>
+                    </ng-template>
+                </mat-menu>
+            </th>
+            <!-- ACTIONS CELL -->
+            <ng-container *ngIf="column.key === 'actions'; else checkForCustomCells">
+                <td mat-cell *matCellDef="let row; let i = dataIndex;">
+                    <ng-container *ngFor="let action of tableOptions?.rowActions">
+                        <button *ngIf="action.buttonType === 'icon'" mat-icon-button class="row-action-btn"
+                            [id]="action.id" aria-label="Table row action button" color="primary"
+                            [matTooltip]="action.tooltip?.label" [matTooltipClass]="'mf-tooltip'"
+                            [matTooltipPosition]="action.tooltip?.position || 'below'"
+                            (click)="onTableRowAction(i, row, action)">
+                            <mat-icon class="material-icons-outlined">{{ action.icon }}</mat-icon>
+                        </button>
+                        <shared-button *ngIf="action.buttonType !== 'icon'" class="row-action-btn" [id]="action.id"
+                            [text]="action.name" [type]="action.buttonType" (click)="onTableRowAction(i, row, action)">
+                        </shared-button>
+                    </ng-container>
+                </td>
+            </ng-container>
+            <!-- CHECK FOR CUSTOM CELLS -->
+            <ng-template #checkForCustomCells>
+                <ng-container *ngIf="column.hasCellTemplate && cellTemplateRef; else defaultCell">
+                    <td mat-cell [ngClass]="column.cellTemplateClassName" *matCellDef="let row; let i = dataIndex;">
+                        <ng-container
+                            *ngTemplateOutlet="cellTemplateRef; context: { row: row, column: column, index: i }">
+                        </ng-container>
+                    </td>
+                </ng-container>
+                <ng-template #defaultCell>
+                    <td mat-cell [ngClass]="column.cellTemplateClassName" *matCellDef="let row">
+                        <div class="cell-value"
+                            [ngClass]="{ 'mf right': column.cellValueType !== 'number' && !column.cellValueType.includes('str') }"
+                            [matTooltip]="row[column.key]" [matTooltipClass]="'mf-tooltip'"
+                            aria-label="Table cell text that displays a tooltip when focused or hovered over"
+                            mfPeShowTooltipIfTruncated>{{ row[column.key] || '&ndash;' }}</div>
+                    </td>
+                </ng-template>
+            </ng-template>
+        </ng-container>
+        <!-- EXPANDABLE (MASTER-DETAIL) ROWS -->
+        <ng-container *ngIf="tableOptions?.hasMasterDetailRows" matColumnDef="expandedMasterDetail">
+            <td mat-cell *matCellDef="let row; let i = dataIndex;" [attr.colspan]="displayedColumns.length">
+                <div *ngIf="!!row.expandedMasterDetail && masterDetailTemplateRef"
+                    class="mf-master-detail-row-container"
+                    [@expansionHeight]="row == expandedRow ? 'expanded' : 'collapsed'">
+                    <div class="mf-master-detail-row-contents">
+                        <ng-container *ngTemplateOutlet="masterDetailTemplateRef; context: { row: row, index: i }">
+                        </ng-container>
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: tableOptions?.stickyHeaders"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns; let last = last"
+            [ngClass]="{ 'last-row': last && !tableOptions?.pagination, 'mf-row-selected': selection?.isSelected(row), 'mf-master-row': tableOptions?.hasMasterDetailRows, 'mf-expanded-row': tableOptions?.hasMasterDetailRows && (expandedRow === row) }">
+        </tr>
+        <ng-container *ngIf="tableOptions?.hasMasterDetailRows">
+            <tr mat-row *matRowDef="let row; columns: ['expandedMasterDetail']"
+                class="mf-master-detail-row mf bkg-light">
+            </tr>
+        </ng-container>
+    </table>
+    <mat-paginator *ngIf="tableOptions?.pagination"
+        [ngClass]="{ 'mat-paginator-sticky': tableOptions.pagination?.sticky }"
+        [pageSizeOptions]="tableOptions?.pagination?.pageSizeOptions" color="accent" showFirstLastButtons>
+    </mat-paginator>
+</div>

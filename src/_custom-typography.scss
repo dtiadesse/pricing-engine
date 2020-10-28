@@ -1,0 +1,69 @@
+/**
+* This file should contain all necessary imports and custom typography for the theme.
+* Format:
+*   - Imports
+*   - Custom Typography Object
+*   - Custom Typography Classes
+*/
+
+@import '~@angular/material/theming';
+@import './colors';
+
+// Prefixes
+$app-prefix: mf;
+
+// ------------------------------ Custom Typography Object ------------------------------
+
+$custom-typography: mat-typography-config(
+  $font-family: 'Work Sans',
+  $display-4: mat-typography-level(8.571rem, 7.143rem, 700, 'Montserrat', normal),
+  $display-3: mat-typography-level(4rem, 4.413rem, 700, 'Montserrat', normal),
+  $display-2: mat-typography-level(3.857rem, 4rem, 700, 'Montserrat', normal),
+  $display-1: mat-typography-level(3.571rem, 3.857rem, 700, 'Montserrat', normal),
+  $headline: mat-typography-level(3.125rem, 3.813rem, 700, 'Montserrat', normal),
+  $title: mat-typography-level(1.875rem, 2.313rem, 700, 'Montserrat', normal),
+  $subheading-2: mat-typography-level(1.5rem, 1.813rem, 700, 'Montserrat', normal),
+  $subheading-1: mat-typography-level(1.25rem, 1.5rem, 700, 'Montserrat', normal),
+  $body-2: mat-typography-level(1rem, 1.5rem, 400, 'Work Sans', normal),
+  $body-1: mat-typography-level(0.875rem, 1.25rem, 400, 'Work Sans', normal),
+  $button: mat-typography-level(0.875rem, 1.25rem, 600, 'Work Sans', normal),
+  $caption: mat-typography-level(0.75rem, 1rem, 400, 'Work Sans', normal),
+  $input: mat-typography-level(0.875rem, 1.125, 400, 'Work Sans', normal)
+);
+
+// ------------------------------ Custom Typography Classes (Mixins) ------------------------------
+
+@mixin custom-navigation-typography() {
+  .mf-breadcrumb {
+    @include mat-typography-font-shorthand(0.75rem, 700, 0.983rem, Montserrat);
+    color: $darker;
+    cursor: pointer;
+  }
+  .mf-navigation-link {
+    @include mat-typography-font-shorthand(0.875rem, 700, 1rem, Work Sans);
+  }
+}
+@mixin custom-display-typography() {
+  .mf-display-small {
+    @include mat-typography-level-to-styles($custom-typography, display-1);
+  }
+}
+@mixin custom-header-typography() {
+  .mat-typography {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      margin: 0;
+    }
+    h5 {
+      @include mat-typography-font-shorthand(1.125rem, 700, 1.375rem, Montserrat);
+    }
+  }
+}
+@mixin custom-typography-classes() {
+  @include custom-navigation-typography();
+  @include custom-display-typography();
+  @include custom-header-typography();
+}

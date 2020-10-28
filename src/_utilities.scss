@@ -1,0 +1,335 @@
+/**
+* This file should contain all necessary utilities for styling text
+* Format:
+*   - Font Size
+*   - Font Weight
+*   - Font Color
+*   - Background Color (with optional transparency for components like Banners)
+*   - Border-Left Color (for components like Banners)
+*   - Text Alignment
+*/
+
+@import './custom-typography';
+
+.#{$app-prefix} {
+  // ------------------------------ Font Size ------------------------------
+
+  &.body {
+    &-large {
+      @include mat-typography-level-to-styles($custom-typography, body-2);
+    }
+
+    &-medium {
+      @include mat-typography-level-to-styles($custom-typography, body-1);
+    }
+
+    &-small {
+      @include mat-typography-level-to-styles($custom-typography, caption);
+    }
+  }
+
+  // ------------------------------ Font Weight ------------------------------
+
+  &.w400 {
+    font-weight: 400 !important;
+  }
+
+  &.w600 {
+    font-weight: 600 !important;
+  }
+
+  // ------------------------------ Text Color ------------------------------
+
+  &.primary {
+    color: $primary !important;
+  }
+
+  &.darker {
+    color: $darker !important;
+  }
+
+  &.dark {
+    color: $dark !important;
+  }
+
+  &.light {
+    color: $light !important;
+  }
+
+  &.lighter {
+    color: $lighter !important;
+  }
+
+  &.lightest {
+    color: $lightest !important;
+  }
+
+  &.secondary,
+  &.active {
+    color: $secondary !important;
+  }
+
+  &.success {
+    color: $success !important;
+  }
+
+  &.info {
+    color: $info !important;
+  }
+
+  &.warning {
+    color: $warning !important;
+  }
+
+  &.error {
+    color: $error !important;
+  }
+
+  &.text-dark {
+    color: $text-dark !important;
+  }
+
+  &.text-link {
+    color: $text-link !important;
+  }
+
+  &.text-form {
+    color: $text-form !important;
+  }
+
+  &.datavis-1 {
+    color: $datavis-1 !important;
+  }
+
+  &.datavis-2 {
+    color: $datavis-2 !important;
+  }
+
+  &.datavis-3 {
+    color: $datavis-3 !important;
+  }
+
+  &.datavis-4 {
+    color: $datavis-4 !important;
+  }
+
+  &.datavis-5 {
+    color: $datavis-5 !important;
+  }
+
+  &.datavis-6 {
+    color: $datavis-6 !important;
+  }
+
+  &.datavis-7 {
+    color: $datavis-7 !important;
+  }
+
+  &.datavis-8 {
+    color: $datavis-8 !important;
+  }
+
+  &.datavis-9 {
+    color: $datavis-9 !important;
+  }
+
+  &.datavis-10 {
+    color: $datavis-10 !important;
+  }
+
+  &.datavis-11 {
+    color: $datavis-11 !important;
+  }
+
+  &.datavis-12 {
+    color: $datavis-12 !important;
+  }
+
+  &.datavis-13 {
+    color: $datavis-13 !important;
+  }
+
+  &.datavis-dark {
+    color: $datavis-dark !important;
+  }
+
+  &.datavis-error {
+    color: $datavis-error !important;
+  }
+
+  // ------------------------------ Background Color ------------------------------
+
+  &.bkg-primary {
+    background-color: $primary !important;
+
+    &-transp {
+      background-color: rgba($color: $primary, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-darker {
+    background-color: $darker !important;
+  }
+
+  &.bkg-dark {
+    background-color: $dark !important;
+  }
+
+  &.bkg-light {
+    background-color: $light !important;
+  }
+
+  &.bkg-lighter {
+    background-color: $lighter !important;
+  }
+
+  &.bkg-lightest {
+    background-color: $lightest !important;
+
+    &-transp {
+      background-color: rgba($color: $lightest, $alpha: 0.8) !important;
+    }
+  }
+
+  &.bkg-secondary,
+  &.bkg-active {
+    background-color: $secondary !important;
+
+    &-transp {
+      background-color: rgba($color: $secondary, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-success {
+    background-color: $success !important;
+
+    &-transp {
+      background-color: rgba($color: $success, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-info {
+    background-color: $info !important;
+
+    &-transp {
+      background-color: rgba($color: $info, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-warning {
+    background-color: $warning !important;
+
+    &-transp {
+      background-color: rgba($color: $warning, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-error {
+    background-color: $error !important;
+
+    &-transp {
+      background-color: rgba($color: $error, $alpha: 0.2) !important;
+    }
+  }
+
+  &.bkg-datavis-1 {
+    background-color: $datavis-1 !important;
+  }
+
+  &.bkg-datavis-2 {
+    background-color: $datavis-2 !important;
+  }
+
+  &.bkg-datavis-3 {
+    background-color: $datavis-3 !important;
+  }
+
+  &.bkg-datavis-4 {
+    background-color: $datavis-4 !important;
+  }
+
+  &.bkg-datavis-5 {
+    background-color: $datavis-5 !important;
+  }
+
+  &.bkg-datavis-6 {
+    background-color: $datavis-6 !important;
+  }
+
+  &.bkg-datavis-7 {
+    background-color: $datavis-7 !important;
+  }
+
+  &.bkg-datavis-8 {
+    background-color: $datavis-8 !important;
+  }
+
+  &.bkg-datavis-9 {
+    background-color: $datavis-9 !important;
+  }
+
+  &.bkg-datavis-10 {
+    background-color: $datavis-10 !important;
+  }
+
+  &.bkg-datavis-11 {
+    background-color: $datavis-11 !important;
+  }
+
+  &.bkg-datavis-12 {
+    background-color: $datavis-12 !important;
+  }
+
+  &.bkg-datavis-13 {
+    background-color: $datavis-13 !important;
+  }
+
+  &.bkg-datavis-dark {
+    background-color: $datavis-dark !important;
+  }
+
+  &.bkg-datavis-error {
+    background-color: $datavis-error !important;
+  }
+
+  // ------------------------------ Border Color ------------------------------
+
+  &.bord-l-primary {
+    border-left-color: $primary !important;
+  }
+
+  &.bord-l-secondary,
+  &.bord-l-active {
+    border-left-color: $secondary !important;
+  }
+
+  &.bord-l-success {
+    border-left-color: $success !important;
+  }
+
+  &.bord-l-info {
+    border-left-color: $info !important;
+  }
+
+  &.bord-l-warning {
+    border-left-color: $warning !important;
+  }
+
+  &.bord-l-error {
+    border-left-color: $error !important;
+  }
+
+  // ------------------------------ Text Alignment ------------------------------
+
+  &.left {
+    text-align: left !important;
+  }
+
+  &.center {
+    text-align: center !important;
+  }
+
+  &.right {
+    text-align: right !important;
+  }
+}

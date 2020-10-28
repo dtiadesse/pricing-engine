@@ -1,0 +1,41 @@
+mat-list.mf-tabular-list {
+    padding-top: 0;
+    .mf-tabular-list-item {
+        .mat-list-item-content {
+            justify-content: space-between;
+            >* {
+                flex: 1 1 100%;
+            }
+        }
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .mf-tabular-list-container {
+        .mf-tabular-list-col {
+            &:nth-child(odd) {
+                padding-right: 24px !important;
+                .mat-divider-horizontal {
+                    width: calc(100% - 24px);
+                }
+            }
+            &:nth-child(even) {
+                padding-right: 0 !important;
+            }
+        }
+    }
+}
+
+@media (min-width: 992px) {
+    .mf-tabular-list-container {
+        .mf-tabular-list-col {
+            &.col-lg:not(:nth-child(2n + 2)),
+            &.col-lg-4:not(:nth-child(3n + 3)) {
+                padding-right: 24px !important;
+                .mat-divider-horizontal {
+                    width: calc(100% - 24px);
+                }
+            }
+        }
+    }
+}

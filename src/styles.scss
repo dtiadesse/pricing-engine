@@ -1,0 +1,928 @@
+
+@import './utilities';
+
+// ------------------------------ Base Styles ------------------------------
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  @include mat-typography-level-to-styles($custom-typography, body-1);
+  text-align: left;
+}
+
+/**
+* This section should only include typography/color overrides, but if necessary, other overrides can go here as well.
+*/
+
+// ------------------------------ Buttons ------------------------------
+
+.mat-flat-button,
+.mat-stroked-button,
+.mat-button-toggle-button {
+  &:hover:not([disabled]) {
+    background-color: $secondary;
+    border-color: $secondary;
+    color: $lightest;
+  }
+}
+
+.mat-button:not(.navigation-link):hover:not([disabled]) {
+  color: $secondary;
+}
+
+.mat-button-toggle-group {
+  @include mat-typography-level-to-styles($custom-typography, button);
+}
+
+.mat-typography .mat-button-toggle-appearance-standard {
+  .mat-button-toggle-label-content {
+    line-height: 2.25rem;
+  }
+}
+
+button.mat-button-base {
+  .mat-icon.mat-icon-inline {
+    font-size: 18px;
+    line-height: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.mat-icon-button {
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+    outline: none;
+
+    &[disabled] {
+      color: $dark;
+      pointer-events: none;
+    }
+
+    &.mat-primary:hover:not([disabled]):not(.mf-snack-bar-icon-close):not(.mf-terms-banner-icon-close) {
+      color: $secondary;
+
+      // TODO: Ask for the "pin" icon to be fixed
+      .mat-icon:not(.mat-icon-inline):not([disabled]) > svg {
+        g > circle {
+          fill: none !important;
+        }
+        g > path {
+          fill: $secondary !important;
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------ Cards ------------------------------
+
+mat-card.mf-card {
+  .mat-card-title.mf-card-title {
+    @include mat-typography-level-to-styles($custom-typography, subheading-1);
+    margin-bottom: 0;
+  }
+
+  .mat-card-title-group.mf-card-title-group {
+    align-items: center;
+  }
+}
+
+// ------------------------------ Chips ------------------------------
+
+.mat-chip.mat-basic-chip,
+.mat-chip.mat-standard-chip {
+  &.mf-chip {
+    display: inline-flex;
+    border-radius: 12px;
+    align-items: center;
+
+    &.mf-chip-small {
+      font-size: 0.625rem;
+      line-height: 0.875rem;
+      min-height: 16px;
+      padding: 0 8px;
+
+      .mf-removable-chip-icon.mat-chip-remove.mat-icon {
+        margin-left: 6px;
+        margin-right: -6px;
+        font-size: 14px;
+        line-height: 14px;
+        width: 14px;
+        height: 14px;
+        opacity: 1;
+      }
+    }
+
+    &.mf-chip-medium {
+      @include mat-typography-level-to-styles($custom-typography, caption);
+      min-height: 24px;
+      padding: 0 16px;
+
+      .mf-removable-chip-icon.mat-chip-remove.mat-icon {
+        margin-left: 8px;
+        margin-right: -12px;
+        font-size: 20px;
+        line-height: 20px;
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+      }
+    }
+
+    font-weight: 600 !important;
+  }
+}
+
+// ------------------------------ Drawer ------------------------------
+
+mat-drawer-container.mf-drawer-container.override-inner-overflow {
+  .mat-drawer {
+    .mat-drawer-inner-container {
+      overflow: hidden;
+    }
+  }
+
+  .mat-drawer-content {
+    overflow: hidden;
+  }
+}
+
+// ------------------------------ Expansion ------------------------------
+
+.mf-expansion-indicator {
+  cursor: pointer;
+  outline: none;
+}
+
+// ------------------------------ Icons ------------------------------
+
+.mat-icon {
+  line-height: 1;
+
+  &:not(.mf-icon-large) {
+    font-size: 24px;
+  }
+
+  &.mf-icon-large {
+    font-size: 90px;
+    width: 90px;
+    height: 90px;
+  }
+
+  &.is-interactive {
+    cursor: pointer;
+  }
+
+  svg {
+    pointer-events: none;
+    vertical-align: unset;
+  }
+
+  svg * {
+    fill: inherit !important;
+
+    // TODO: Ask for the "pin" icon to be fixed
+    g[id='Shape-2'] > path {
+      fill: $lightest !important;
+    }
+  }
+
+  &.mat-badge-small {
+    &.mat-badge-above .mat-badge-content {
+      top: -4px;
+    }
+
+    &.mat-badge-overlap.mat-badge-after .mat-badge-content {
+      right: -16px;
+    }
+
+    .mat-badge-content {
+      width: 26px;
+      height: 14px;
+      font-size: 12px;
+      line-height: 14px;
+      border-radius: 7px;
+    }
+  }
+}
+
+.mf-breadcrumb {
+  .mat-icon.mat-icon-inline {
+    font-size: 18px;
+    line-height: 1;
+    width: 18px;
+    height: 18px;
+    vertical-align: text-bottom;
+  }
+}
+
+// ------------------------------ Input ------------------------------
+
+mat-form-field.mf-form-field {
+  &.mat-form-field-appearance-outline {
+    // set the default padding defined under One Roof
+    &:not(.mf-remove-pb) .mat-form-field-wrapper {
+      padding-bottom: 24px;
+    }
+
+    // but give everyone the ability to easily remove it with the extra class
+    &.mf-remove-pb .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    .mat-form-field-flex {
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    .mat-form-field-outline {
+      &.mat-form-field-outline-thick * {
+        border-width: 1px;
+      }
+
+      .mat-form-field-outline-start {
+        min-width: 11px !important;
+        border-radius: 4px 0 0 4px;
+      }
+
+      .mat-form-field-outline-end {
+        border-radius: 0 4px 4px 0;
+      }
+    }
+
+    &:not(.mf-form-field-textarea) {
+      .mat-form-field-infix {
+        height: 44px;
+        padding: 0.3em 0;
+      }
+    }
+
+    &.mf-form-field-textarea {
+      .mat-form-field-infix {
+        padding: 0.75em 0 1.25em 0;
+
+        textarea.mat-input-element {
+          overflow: hidden;
+          height: 88px;
+
+          &.cdk-textarea-autosize {
+            min-height: 20px;
+          }
+        }
+      }
+    }
+
+    .mat-form-field-label-wrapper {
+      top: -1em;
+      padding-top: 1em;
+    }
+
+    &:not(.mf-condensed-form-field):not(.mf-highly-condensed-form-field):not(.mf-form-field-textarea) {
+      &:not(.mat-focused) {
+        .mat-form-field-label-wrapper {
+          top: -1.25em;
+          padding-top: 1.25em;
+        }
+      }
+
+      &.mat-form-field-can-float.mat-form-field-should-float:not(.mat-focused) {
+        label.mat-form-field-label {
+          margin-top: 0;
+        }
+      }
+    }
+
+    .mat-form-field-prefix {
+      padding-right: 8px;
+    }
+
+    .mat-form-field-suffix {
+      padding-left: 8px;
+      margin-right: -8px;
+    }
+
+    .mat-form-field-prefix,
+    .mat-form-field-suffix {
+      .not-interactive {
+        pointer-events: none;
+      }
+
+      .mat-icon {
+        display: inline-block;
+        font-size: 24px;
+        line-height: 1;
+      }
+    }
+
+    .mat-form-field-subscript-wrapper {
+      padding: 0;
+      margin-top: 1px;
+    }
+
+    &.mf-remove-pb .mat-form-field-subscript-wrapper {
+      margin-top: 24px;
+    }
+
+    &.mf-form-field-select {
+      .mat-select-arrow-wrapper {
+        transform: unset;
+      }
+    }
+
+    &.mf-condensed-form-field {
+      .mat-form-field-infix {
+        height: 36px;
+        padding: 0;
+      }
+
+      &:not(.mat-focused) {
+        .mat-form-field-label-wrapper {
+          top: -1.5em;
+          padding-top: 1.5em;
+        }
+
+        &.mat-form-field-can-float.mat-form-field-should-float {
+          .mat-form-field-label-wrapper {
+            top: -1em;
+            padding-top: 1em;
+          }
+        }
+      }
+    }
+
+    &.mf-highly-condensed-form-field {
+      .mat-form-field-infix {
+        height: 32px;
+        padding: 0;
+      }
+
+      &:not(.mat-focused) {
+        .mat-form-field-label-wrapper {
+          top: -1.6em;
+          padding-top: 1.6em;
+        }
+
+        &.mat-form-field-can-float.mat-form-field-should-float {
+          .mat-form-field-label-wrapper {
+            top: -1em;
+            padding-top: 1em;
+          }
+        }
+      }
+    }
+
+    &.mf-form-field-with-chips {
+      .mat-form-field-infix {
+        height: unset;
+        min-height: 44px;
+        padding: 0.3em 0 1em;
+      }
+    }
+  }
+}
+
+.mat-datepicker-content {
+  mat-calendar.mf-datepicker-panel {
+    height: 308px !important;
+
+    .mat-calendar-header {
+      .mat-calendar-controls {
+        margin: unset;
+        margin-bottom: 5%;
+
+        button.mat-button-base.mat-icon-button {
+          width: 40px;
+          height: 40px;
+          line-height: 40px;
+        }
+      }
+    }
+
+    .mat-calendar-table-header {
+      th {
+        @include mat-typography-level-to-styles($custom-typography, caption);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+mat-radio-group.mf-radio-group {
+  mat-radio-button.mf-radio-button {
+    label.mat-radio-label {
+      margin-bottom: 0 !important;
+    }
+  }
+}
+
+.mat-select-panel.mf-form-field-select-panel,
+.mat-autocomplete-panel.mf-form-field-autocomplete-panel {
+  // this will avoid seeing the panel jump while animating
+  &.ng-animating {
+    visibility: hidden;
+  }
+
+  &.mf-form-field-multiselect {
+    min-width: calc(100% + 32px) !important;
+    position: relative;
+    left: 24px !important;
+  }
+
+  &:not(.mf-condensed-form-field-select-panel):not(.mf-highly-condensed-form-field-select-panel):not(.mf-form-field-autocomplete-panel) {
+    margin-top: 27px;
+  }
+
+  &.mf-condensed-form-field-select-panel {
+    margin-top: 23px;
+  }
+
+  &.mf-highly-condensed-form-field-select-panel {
+    margin-top: 21px;
+  }
+
+  &.mf-form-field-autocomplete-panel {
+    margin-top: -2px;
+  }
+
+  &:not(.mf-custom-options-template) {
+    .mat-option {
+      line-height: 2.25em;
+      height: 2.25em;
+    }
+  }
+
+  &.mf-custom-options-template {
+    .mat-option {
+      line-height: 3.5em;
+      height: 3.5rem;
+
+      &.mf-no-results-found {
+        line-height: 2.75em;
+        height: 2.75rem;
+      }
+
+      &:not(.mf-option-selection):not(.mf-autocomplete-option) {
+        .mat-option-text {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+
+      &.mf-option-selection,
+      &.mf-autocomplete-option {
+        .mat-option-text {
+          display: flex;
+          flex-direction: row;
+
+          div.mf-option-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+        }
+      }
+
+      &.mf-option-selection {
+        cursor: default;
+
+        .mat-option-pseudo-checkbox {
+          margin-right: 16px;
+
+          &:not(.mat-pseudo-checkbox-disabled) {
+            cursor: pointer !important;
+          }
+        }
+      }
+
+      .mat-option-text {
+        .mf-option-text-item {
+          @include mat-typography-level-to-styles($custom-typography, body-1);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    &.mf-form-field-select-radio {
+      .mat-option {
+        .mf-radio-button {
+          label.mat-radio-label {
+            margin-bottom: 5px !important;
+          }
+
+          .mat-radio-label-content {
+            padding-left: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------ Menu ------------------------------
+
+.mat-menu-panel.mf-contextual-menu {
+  min-height: 36px;
+
+  .mat-menu-content {
+    padding: 0;
+
+    .mat-menu-item {
+      line-height: 20px;
+      height: 36px;
+      outline: none;
+      padding: 8px 16px;
+    }
+  }
+}
+
+// ------------------------------ Menu (Tooltip Behavior) ------------------------------
+
+.mat-menu-panel.mf-tooltip-menu {
+  max-width: 250px;
+  min-height: 56px;
+
+  .mat-menu-content {
+    padding: 16px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mat-menu-item.mf-tooltip-menu-item {
+      white-space: normal;
+      overflow: unset;
+      text-overflow: unset;
+      display: flex;
+      height: auto;
+      padding: 0;
+      &:not(:first-child) {
+        padding-top: 16px;
+      }
+    }
+  }
+
+  &.mf-leading-icon-tooltip-menu {
+    div.mf-tooltip-menu-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+}
+
+// ------------------------------ Side Nav List ------------------------------
+
+.mf-nav-list {
+  // parent routes should recieve the normal font styles
+  .mat-expansion-panel-header-title {
+    .mat-list-item .mat-list-item-content {
+      @include mat-typography-level-to-styles($custom-typography, body-1);
+      font-weight: 600;
+    }
+  }
+
+  // sub-routes should recieve the smaller font styles
+  &.mat-list-base .mat-expansion-panel-body .mat-list-item {
+    @include mat-typography-level-to-styles($custom-typography, caption);
+
+    &.active-route {
+      font-weight: 600;
+    }
+  }
+}
+
+// ------------------------------ Slide Toggle ------------------------------
+
+.mf-slide-toggle-container {
+  @include mat-typography-level-to-styles($custom-typography, body-1);
+  font-weight: 600;
+}
+
+// ------------------------------ Tables ------------------------------
+
+.mat-table {
+  .mat-header-cell {
+    @include mat-typography-level-to-styles($custom-typography, body-1);
+    font-weight: 600;
+    color: $primary;
+  }
+}
+
+.mat-menu-panel.column-menu .mat-menu-content {
+  .column-menu-sort .column-menu-sort-label {
+    @include mat-typography-level-to-styles($custom-typography, body-1);
+    color: $darker;
+  }
+}
+
+.mat-header-row,
+.mat-row {
+  line-height: 1.25rem;
+}
+
+.mf-condensed-rows,
+.mf-highly-condensed-rows {
+  .mat-header-cell > *,
+  .mat-cell > * {
+    @include mat-typography-level-to-styles($custom-typography, caption);
+  }
+  .mat-cell {
+    .mf-navigation-link {
+      font-weight: 700 !important;
+    }
+  }
+}
+
+.mat-paginator .mat-paginator-container * {
+  @include mat-typography-level-to-styles($custom-typography, body-1);
+  font-weight: 600;
+}
+
+// ------------------------------ Tabs ------------------------------
+
+.mf-card-content {
+  .mat-tab-group.mf-tab-group .mat-tab-label:first-of-type {
+    margin-left: 0 !important;
+  }
+}
+
+.mat-tab-group.mf-tab-group,
+.mat-tab-nav-bar.mf-tab-nav-bar {
+  .mat-tab-links {
+    padding: 0 8px;
+  }
+  .mat-tab-label,
+  .mat-tab-link {
+    opacity: 1;
+    min-width: unset;
+    padding: 0;
+    margin: 0 24px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .mat-ink-bar {
+    height: 6px;
+  }
+}
+
+// ------------------------------ Tooltip ------------------------------
+
+.mat-tooltip.mf-tooltip {
+  @include mat-typography-level-to-styles($custom-typography, caption);
+  padding: 16px;
+  word-wrap: break-word;
+  text-overflow: unset;
+}
+
+// ------------------------------------------------------------
+
+.mf-list-item-leading-icon ~ .mf.body-large,
+.mf-banner-container.mf.body-large {
+  line-height: 1.25rem !important;
+}
+
+.mf-list-item-leading-icon ~ .mf.body-medium,
+.mf-banner-container.mf.body-medium {
+  line-height: 1rem !important;
+}
+
+// Extra common utilities
+.fill-space {
+  flex: 1 1 auto;
+}
+
+.mf-w-7 {
+  width: 7% !important;
+}
+
+.mf-w-10 {
+  width: 10% !important;
+}
+
+.mf-w-12 {
+  width: 12% !important;
+}
+
+.mf-w-15 {
+  width: 15% !important;
+}
+
+.mf-w-20 {
+  width: 20% !important;
+}
+
+.mf-link {
+  &:not([disabled]) {
+    cursor: pointer;
+
+    &:hover {
+      color: $secondary;
+      text-decoration: underline;
+    }
+  }
+}
+
+.mf-vertical-divider-small {
+  height: 32px;
+}
+
+.mf-vertical-divider-large {
+  height: 80px;
+}
+
+// ------------------------------------------------------------
+
+/**
+* TODO: All of the styles listed below (grouped by capability) need to be revisted to see if the styles are actually
+* necessary anymore. If any of the styles listed below are specific to External or Internal, then we should move them
+* to the "styles.scss" under the appropriate app.
+*/
+
+// ------------------------------ ILS Team Styles ------------------------------
+/**
+* TODO: ILS UI devs to determine if any of the remaining styles below are actually necessary.
+* Updated: Kenneth Widemon, 10/18/2020
+*/
+
+mat-card.portfolio {
+  padding: 0;
+}
+
+mat-card.portfolio mat-card-title {
+  padding: 16px 16px 0 16px;
+}
+
+mat-card.portfolio table {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  width: 100%;
+}
+
+mat-card.portfolio table tr:last-child td,
+mat-card.portfolio table {
+  border: none;
+}
+
+// ------------------------------ HUB Team Styles ------------------------------
+/**
+* TODO: HUB UI devs to determine if any of the remaining styles below are actually necessary.
+* Updated: Kenneth Widemon, 10/18/2020
+*/
+
+// Welcome Modal Styles
+.welcomeModal {
+  width: 50%;
+}
+
+#feedback-modal {
+  width: 70vw;
+}
+
+// Feedback Modal and Welcome Modal Styles
+@media only screen and (max-width: 576px) {
+  #feedback-modal {
+    width: 100%;
+  }
+
+  .welcomeModal {
+    width: 100vw;
+  }
+}
+
+// Optigo background image for PageNotFoundComponent & UnauthorizedComponent
+// .optigo {
+//   background: url('assets/icons/Optigo-art/o-art-investors.png') no-repeat center right;
+//   background-size: contain;
+// }
+
+mat-progress-bar.one-roof {
+  height: 8px;
+  border-radius: 4px;
+}
+
+mat-progress-bar.one-roof .mat-progress-bar-buffer {
+  background-color: $dark;
+}
+
+mat-progress-bar.one-roof .mat-progress-bar-fill::after {
+  background-color: $info;
+}
+
+// ------------------------------ BAP Team Styles ------------------------------
+/**
+* TODO: BAP UI devs to determine if any of the remaining styles below are actually necessary.
+* Updated: Kenneth Widemon, 10/18/2020
+*/
+
+.borrower-dialog-container .mat-dialog-container {
+  margin: 20px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 0 !important;
+  height: 624px;
+}
+
+.borrower-confirmation-dialog .mat-dialog-container {
+  height: 50%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+// ------------------------------ ADV Team Styles ------------------------------
+/**
+* TODO: ADV UI devs to determine if any of the remaining styles below are actually necessary.
+* Updated: Kenneth Widemon, 10/18/2020
+*/
+
+.mfadv-custom-dialog-container .mat-dialog-container {
+  margin: 20px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 0 !important;
+  height: 680px;
+}
+
+.mfadv-confirmation-dialog .mat-dialog-container {
+  height: 70%;
+}
+
+// ------------------------------ AG-GRID Styles ------------------------------
+/**
+* TODO: Determine who exactly needs these styles.
+*   - Currently used by DLS, anyone else?
+* Updated: Kenneth Widemon, 10/18/2020
+*/
+
+.ag-header-cell-text,
+.ag-header-group-text {
+  font-size: 14px;
+}
+
+.ag-theme-balham {
+  .ag-cell.ag-cell-inline-editing {
+    height: 36px;
+  }
+  .ag-cell {
+    line-height: 36px;
+  }
+  .ag-header-cell::after,
+  .ag-header-group-cell::after {
+    height: 24px;
+  }
+}
+
+.ag-theme-balham .ag-header {
+  background-color: #cccccc !important;
+  color: #464645;
+  font-size: 14px;
+}
+
+.ag-header-cell-label {
+  justify-content: center;
+}
+
+.ag-theme-balham .ag-row-odd {
+  background-color: #fcfdfe;
+}
+
+.ag-theme-balham .sub-total {
+  background-color: #e9e9e9 !important;
+}
+
+.ag-theme-balham .rent-total {
+  background-color: #f2f2f2 !important;
+  border: 0px;
+  font-weight: 700;
+}
+
+.ag-theme-balham .total,
+.ag-theme-balham .aa-header {
+  background-color: #5197cc !important;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.ag-theme-balham .sub-header {
+  background-color: #8db9da !important;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.ag-row-hover {
+  background-color: #e2f3ff !important;
+}

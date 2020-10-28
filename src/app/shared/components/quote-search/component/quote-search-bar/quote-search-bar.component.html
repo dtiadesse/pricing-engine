@@ -1,0 +1,12 @@
+<mat-form-field class="mf-form-field mf-remove-pb search-container">
+    <mat-label>{{ label }}</mat-label>
+    <input matInput class="search-input" id="mfSearchFieldInput" [formControl]="searchControl" #searchInput [matAutocomplete]="auto" placeholder="{{placeholder}}" />
+    <mat-icon class="not-interactive" matPrefix>search</mat-icon>
+    <mat-autocomplete class="mf-form-field-autocomplete-panel" id="mfSearchAutoComplete" #auto="matAutocomplete">
+        <ng-container *ngFor="let opportunity of opportunities">
+            <mat-option [hidden]="!typeAheadVisible" *ngFor="let quote of opportunity.quoteResults" class="mf-option" [value]="'Q' + quote.quoteId" (click)="navigate(quote.quoteId)">
+                <mf-pe-search-result [opportunityId]="opportunity.opportunityId" [loanId]="opportunity.loanId" [quote]="quote" [propertyName]="opportunity.propertyName" [resultType]="searchType"></mf-pe-search-result>
+            </mat-option>
+        </ng-container>
+    </mat-autocomplete>
+</mat-form-field>
