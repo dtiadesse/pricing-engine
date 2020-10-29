@@ -25,7 +25,8 @@
                                 disableRipple="true">
                                 <mat-tab class="mf-tab-label mf darker" [id]="tab.label"
                                     *ngFor="let tab of (asyncTabs | async); let i = index">
-                                    <ng-template mat-tab-label>{{ tab.label }} ({{ tab.content.length }})</ng-template>
+                                    <ng-template mat-tab-label>{{ tab.label }} ({{ tab.content.length }} ,
+                                        {{tab.quoteCount}})</ng-template>
                                     <ng-template matTabContent>
                                         <div class="mt-4" *ngIf="tab.content?.length">
                                             <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable

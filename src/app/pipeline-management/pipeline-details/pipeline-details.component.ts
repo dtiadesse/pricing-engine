@@ -29,6 +29,7 @@ export interface PipelineTab {
   index?: number;
   tableOptions?: TableOptions;
   quoteTableOptions?: TableOptions;
+  quoteCount?: number;
 }
 
 @Component({
@@ -93,6 +94,18 @@ export class PipelineDetailsComponent implements OnInit {
     this.getPipelineResults();
   }
 
+  getQuoteCount(items: any) {
+    let count = 0;
+    if (items.length > 0) {
+      items.forEach(item => {
+        count = count + item.quoteResults.length
+      });
+
+    }
+    return count;
+  }
+
+
   // ------------------------------ Table ------------------------------
   getQuotes(data) {
     const quoteResults = _.map(data, (item: any) => {
@@ -106,6 +119,7 @@ export class PipelineDetailsComponent implements OnInit {
     // this.pipelineService.getPipelineResults().subscribe((data: any) => {
     this.quotes = MOCK_PIPELINE_RESULTS;
     //this.quotes = data;
+    const cnt = this.getQuoteCount(this.quotes.newQuotes);
     this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
       observer.next([
         {
@@ -113,21 +127,24 @@ export class PipelineDetailsComponent implements OnInit {
           content: this.getQuotes(this.quotes.newQuotes),
           index: 0,
           tableOptions: this.defaultTableOptions,
-          quoteTableOptions: this.quoteResultsTableOptions
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(this.quotes.newQuotes)
         },
         {
           label: 'Extension',
           content: this.getQuotes(this.quotes.extensionQuotes),
           index: 1,
           tableOptions: this.defaultTableOptions,
-          quoteTableOptions: this.quoteResultsExtensionTableOptions
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(this.quotes.extensionQuotes)
         },
         {
           label: 'Awaiting Approval',
           content: this.getQuotes(this.quotes.awaitingApprovalQuotes),
           index: 2,
           tableOptions: this.approvalTableOptions,
-          quoteTableOptions: this.quoteResultsApprovalTableOptions
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(this.quotes.awaitingApprovalQuotes)
         }
       ]);
       this.lastUpdated = new Date();
