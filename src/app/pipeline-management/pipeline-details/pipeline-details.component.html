@@ -12,6 +12,8 @@
             <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
                 <ng-container mf-card-title-group-action>
                     <div>
+                        <button mat-raised-button
+                            (click)="toggle()">{{allRowsExpanded ? 'Collapse' : 'Expand'}}</button>
                         <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
                             <mat-icon class="material-icons-outlined">refresh</mat-icon>
                         </button>
@@ -64,7 +66,7 @@
                                         pipelineResultsTable.expandedRow =
                                           pipelineResultsTable.expandedRow === row ? null : row
                                       " [@expansionIndicatorRotate]="
-                                        row == pipelineResultsTable.expandedRow
+                                      (row == pipelineResultsTable.expandedRow || allRowsExpanded)
                                           ? 'expanded'
                                           : 'collapsed'
                                       ">
@@ -121,7 +123,8 @@
                                                     </ng-template>
                                                 </ng-template>
                                                 <ng-template #masterDetailTemplate let-row="row" let-index="index">
-                                                    <ng-container *ngIf="pipelineResultsTable.expandedRow !== null">
+                                                    <ng-container
+                                                        *ngIf="(pipelineResultsTable.expandedRow !== null ||allRowsExpanded )">
                                                         <mf-pe-table [id]="'quoteResultsTable-'+ index"
                                                             [tableData]="row.expandedMasterDetail"
                                                             [tableOptions]="tab.quoteTableOptions">
