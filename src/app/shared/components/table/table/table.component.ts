@@ -43,6 +43,8 @@ import {
 export class TableComponent implements OnInit, AfterViewInit {
   @Input() id: string;
 
+  @Input() expandAllRows: boolean = false;
+
   dataSource: MatTableDataSource<any>;
   private _tableData: any[] = [];
   @Input()
@@ -142,14 +144,12 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.dataSource = new MatTableDataSource(this.tableData);
-
     // init columns
     this.updateColumns();
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
-
     // need to add MatSort and MatPaginator when using MatTableDataSource
     this.dataSource.sort = this.sort;
 
