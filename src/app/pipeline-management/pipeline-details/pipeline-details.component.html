@@ -32,7 +32,7 @@
                                     <ng-template matTabContent>
                                         <div class="mt-4" *ngIf="tab.content?.length">
                                             <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
-                                                [tableData]="tab.content" [tableOptions]="tab.tableOptions">
+                                                [tableData]="tab.content" [tableOptions]="tab.tableOptions"  [expandAllRows]="allRowsExpanded">
                                                 <ng-template #cellTemplate let-row="row" let-column="column"
                                                     let-index="index">
                                                     <ng-container *ngIf="
