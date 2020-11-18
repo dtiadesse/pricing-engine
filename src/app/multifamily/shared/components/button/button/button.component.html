@@ -1,0 +1,36 @@
+<ng-container [ngSwitch]="type">
+    <!-- Primary (By Default) -->
+    <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="defaultPrimaryBtn"></ng-container>
+    </ng-container>
+    <!-- Secondary -->
+    <button *ngSwitchCase="'secondary'" mat-stroked-button disableRipple="true" class="mf-secondary-btn"
+        [ngClass]="fullBtnClassName" id="{{id}}" color="primary" [disabled]="disabled"
+        (click)="buttonClick($event)">{{ text }}<mat-icon *ngIf="icon" class="material-icons-outlined"
+            [ngClass]="'mf-icon-' + iconAlignment" inline="true">{{ icon }}</mat-icon>
+    </button>
+    <!-- Teritiary -->
+    <button *ngSwitchCase="'tertiary'" mat-button disableRipple="true" class="mf-tertiary-btn"
+        [ngClass]="fullBtnClassName" id="{{id}}" color="primary" [disabled]="disabled"
+        (click)="buttonClick($event)">{{ text }}<mat-icon *ngIf="icon" class="material-icons-outlined"
+            [ngClass]="'mf-icon-' + iconAlignment" inline="true">{{ icon }}</mat-icon>
+    </button>
+    <!-- Toggle -->
+    <mat-button-toggle-group *ngSwitchCase="'toggle'" class="mf-toggle-btn" id="{{id}}"
+        [name]="toggleButtonGroup.groupName" [value]="toggleButtonGroup?.value" [disabled]="disabled"
+        (change)="onToggleButtonChange($event)">
+        <mat-button-toggle *ngFor="let btn of toggleButtonGroup.buttons" [name]="btn.name" [value]="btn.value"
+            [disabled]="btn.disabled">
+            <ng-container *ngIf="!btn.icon; else showIcon">{{btn.text}}</ng-container>
+            <ng-template #showIcon>
+                <mat-icon svgIcon="{{ btn.icon }}"></mat-icon>
+            </ng-template>
+        </mat-button-toggle>
+    </mat-button-toggle-group>
+</ng-container>
+<ng-template #defaultPrimaryBtn>
+    <button mat-flat-button disableRipple="true" class="mf-primary-btn" [ngClass]="fullBtnClassName" id="{{id}}"
+        color="primary" [disabled]="disabled" (click)="buttonClick($event)">{{ text }}<mat-icon *ngIf="icon"
+            class="material-icons-outlined" [ngClass]="'mf-icon-' + iconAlignment" inline="true">{{ icon }}</mat-icon>
+    </button>
+</ng-template>

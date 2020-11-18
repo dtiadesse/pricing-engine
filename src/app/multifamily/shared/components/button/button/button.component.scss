@@ -1,0 +1,59 @@
+button.mat-button-base {
+    height: 40px;
+    outline: none;
+
+    &.mat-button[disabled]>* {
+        pointer-events: none;
+    }
+}
+
+.mf-secondary-btn {
+    border-width: 2px;
+    border-style: solid;
+
+    &[disabled] {
+        border: none;
+    }
+}
+
+.mf-primary-btn,
+.mf-secondary-btn,
+.mf-tertiary-btn {
+    .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .mat-icon {
+            &.mf-icon-left {
+                margin-right: 4px;
+            }
+
+            &.mf-icon-right {
+                margin-left: 4px;
+            }
+        }
+    }
+
+    &.mf-button-icon-left {
+        .mat-button-wrapper {
+            flex-direction: row-reverse;
+            margin-right: 4px;
+        }
+    }
+}
+
+.mf-toggle-btn.mat-button-toggle-group-appearance-standard {
+    height: 40px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 3px;
+
+    .mat-button-toggle {
+        .mat-button-toggle-button .mat-button-toggle-label-content {
+            height: 40px;
+            width: calc(100% - 40px);
+            padding: 0 20px;
+        }
+    }
+}

@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { QuoteSearchComponent } from '../quote-search/component/quote-search-bar/quote-search-bar.component'
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { QuoteSearchComponent } from "../quote-search/component/quote-search-bar/quote-search-bar.component";
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from "@angular/forms";
 // import { MatIconModule, MatInputModule, MatAutocompleteModule } from '@angular/material';
-import { SearchResultComponent } from './component/search-result/search-result.component';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { SearchResultComponent } from "./component/search-result/search-result.component";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
   declarations: [QuoteSearchComponent, SearchResultComponent],
@@ -16,8 +16,8 @@ import { MatInputModule } from '@angular/material/input';
     MatAutocompleteModule,
     MatIconModule,
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
-  exports: [QuoteSearchComponent]
+  exports: [QuoteSearchComponent],
 })
-export class QuoteSearchModule { }
+export class QuoteSearchModule {}

@@ -1,0 +1,52 @@
+.mf-modal-title-group {
+    margin-bottom: 24px;
+
+    display: flex;
+    align-items: center;
+
+    .mat-dialog-title.mf-modal-title {
+        flex: 1 0 auto;
+        padding-left: 32px;
+    }
+}
+
+.mf-modal-close-btn-container {
+    display: flex;
+}
+
+.mf-modal-title-group,
+.mf-modal-close-btn-container {
+    button.mf-modal-close-btn {
+        width: 24px;
+        height: 24px;
+
+        &:hover {
+            color: currentColor !important;
+        }
+    }
+}
+
+.mat-dialog-content.mf-modal-content {
+    margin: 0;
+    padding: 24px 16px;
+    max-height: 70vh;
+
+    &.mf-status-modal-content {
+        padding: 0;
+    }
+}
+
+.mat-dialog-actions.mf-modal-actions {
+    padding: 0;
+    margin-bottom: 0;
+    padding-top: 24px;
+    justify-content: flex-end;
+
+    &.mf-status-modal-actions {
+        justify-content: center;
+    }
+
+    > :not(:last-child) {
+        margin-right: 24px;
+    }
+}

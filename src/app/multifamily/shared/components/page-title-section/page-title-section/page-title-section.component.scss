@@ -1,0 +1,19 @@
+.mf-title-section-container {
+    display: flex;
+    height: 88px;
+    padding: 16px 0;
+}
+
+.mf-title-section-navigation {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mf-breadcrumb {
+    text-transform: uppercase;
+}
+
+.mf-page-title {
+    line-height: 29px;
+}

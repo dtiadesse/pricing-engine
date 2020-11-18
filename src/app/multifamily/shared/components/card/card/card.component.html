@@ -1,0 +1,23 @@
+<mat-card [id]="id" class="mf-card elevated"
+    [ngClass]="{ 'mf-card-expandable': isExpandable, 'display-with-dividers': displayWithDividers }">
+    <mat-card-title-group *ngIf="title" [id]="id + 'TitleGroup'" class="mf-card-title-group">
+        <button mat-icon-button [id]="id + 'ExpansionInd'" *ngIf="isExpandable" class="mf-expansion-indicator"
+            [disabled]="expansionIndicatorDisabled" [disableRipple]="true" (click)="toggleContent()">
+            <mat-icon [@expansionIndicatorRotate]="showContent ? 'expanded' : 'collapsed'">expand_more</mat-icon>
+        </button>
+        <mat-card-title [id]="id + 'Title'" class="mf-card-title">{{ title }}</mat-card-title>
+        <ng-content select="ng-container[mf-card-title-group-action]"></ng-content>
+    </mat-card-title-group>
+    <ng-container *ngIf="showContent">
+        <mat-divider *ngIf="displayWithDividers" [inset]="true"></mat-divider>
+        <mat-card-content [id]="id + 'Content'" class="mf-card-content">
+            <ng-content select="ng-container[mf-card-content]"></ng-content>
+        </mat-card-content>
+    </ng-container>
+    <ng-container *ngIf="showFooter && showContent">
+        <mat-divider *ngIf="displayWithDividers" [inset]="true"></mat-divider>
+        <mat-card-footer [id]="id + 'Footer'" class="mf-card-footer">
+            <ng-content select="ng-container[mf-card-footer]"></ng-content>
+        </mat-card-footer>
+    </ng-container>
+</mat-card>

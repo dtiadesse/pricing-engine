@@ -1,0 +1,11 @@
+.status-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    mat-icon.mat-icon {
+        margin-bottom: 9px;
+        width: 90px;
+        height: 90px;
+    }
+}

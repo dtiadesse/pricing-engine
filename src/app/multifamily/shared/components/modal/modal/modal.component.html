@@ -1,0 +1,24 @@
+<ng-container *ngIf="type !== 'status'">
+    <div class="mf-modal-title-group">
+        <h4 mat-dialog-title class="mf-modal-title mf center">{{ title }}</h4>
+        <button id="mfModalCloseBtn" class="mf-modal-close-btn" mat-icon-button color="primary" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <mat-divider></mat-divider>
+</ng-container>
+<div *ngIf="type === 'status'" class="mf-modal-close-btn-container">
+    <div class="fill-space"></div>
+    <button id="mfModalCloseBtn" class="mf-modal-close-btn" mat-icon-button color="primary" (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="mf-modal-content" [ngClass]="{ 'mf-status-modal-content': type === 'status' }">
+    <ng-content select="ng-container[mf-modal-content]"></ng-content>
+</mat-dialog-content>
+<ng-container *ngIf="type !== 'status'">
+    <mat-divider></mat-divider>
+</ng-container>
+<mat-dialog-actions class="mf-modal-actions" [ngClass]="{ 'mf-status-modal-actions': type === 'status' }">
+    <ng-content select="ng-container[mf-modal-actions]"></ng-content>
+</mat-dialog-actions>

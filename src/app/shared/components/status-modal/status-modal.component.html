@@ -1,0 +1,23 @@
+<shared-modal [type]="'status'" (closeModal)="close()">
+    <ng-container mf-modal-content>
+        <div class="container-fluid px-0">
+            <div class="row mx-0">
+                <div class="col-12 px-0">
+                    <div class="status-content">
+                        <mat-icon class="mf-icon-large" [svgIcon]="dialogConfiguration.iconName"
+                            [ngClass]="dialogConfiguration.iconClass"></mat-icon>
+                        <span *ngFor="let msg of dialogConfiguration.messages; last as last" class="mf center"
+                            [ngClass]="{ 'pb-4': !last }">{{msg}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container mf-modal-actions>
+        <shared-button [id]="dialogConfiguration.btnId + 'SecondaryBtn'" [text]="dialogConfiguration.secondaryText"
+            [type]="'secondary'" [mat-dialog-close]="false">
+        </shared-button>
+        <shared-button [id]="dialogConfiguration.btnId + 'PrimaryBtn'" [text]="dialogConfiguration.primaryText"
+            [mat-dialog-close]="true"></shared-button>
+    </ng-container>
+</shared-modal>
