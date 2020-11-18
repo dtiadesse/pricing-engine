@@ -1,0 +1,11 @@
+<div class="mf-title-section-container">
+    <div class="mf-title-section-navigation">
+        <div *ngIf="breadcrumbLabel" class="mf-breadcrumb-container">
+            <span class="mf-breadcrumb" (click)="onBreadcrumbClick()">
+                <mat-icon inline="true">arrow_back</mat-icon> {{ breadcrumbLabel }}
+            </span>
+        </div>
+        <div class="fill-space"></div>
+        <h3 *ngIf="pageTitle" id="mfPageTitle" class="mf-page-title"> {{ pageTitle }} </h3>
+    </div>
+</div>

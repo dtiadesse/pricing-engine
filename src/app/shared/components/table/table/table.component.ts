@@ -8,19 +8,19 @@ import {
   Output,
   TemplateRef,
   ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
-import * as _ from 'lodash';
+  ViewEncapsulation,
+} from "@angular/core";
+import { SelectionModel } from "@angular/cdk/collections";
+import * as _ from "lodash";
 
 // Material
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatSort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 // Shared
-import { expansionHeight } from '../../../../multifamily/shared/components/animate-animation'
+import { expansionHeight } from "../../../../multifamily/shared/components/animate-animation";
 
 // Models
 import {
@@ -30,18 +30,20 @@ import {
   SelectedTableRowEvent,
   TableColumn,
   TableOptions,
-  TableRowAction
-} from '../model/table.model';
+  TableRowAction,
+} from "../model/table.model";
 
 @Component({
-  selector: 'mf-pe-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss'],
+  selector: "mf-pe-table",
+  templateUrl: "./table.component.html",
+  styleUrls: ["./table.component.scss"],
   animations: [expansionHeight],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class TableComponent implements OnInit, AfterViewInit {
   @Input() id: string;
+
+  @Input() expandAllRows: boolean = false;
 
   dataSource: MatTableDataSource<any>;
   private _tableData: any[] = [];
@@ -55,13 +57,14 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   // Custom Cells
-  @ContentChild('cellTemplate', { static: false }) cellTemplateRef: TemplateRef<any>;
-
-  // Expanded Rows
-  @ContentChild('masterDetailTemplate', { static: false }) masterDetailTemplateRef: TemplateRef<
+  @ContentChild("cellTemplate", { static: false }) cellTemplateRef: TemplateRef<
     any
   >;
-  expandedRow: any | null;
+
+  // Expanded Rows
+  @ContentChild("masterDetailTemplate", { static: false })
+  masterDetailTemplateRef: TemplateRef<any>;
+  public expandedRow: any | null;
 
   private _tableOptions: TableOptions = _.clone(DEFAULT_TABLE_OPTIONS);
   @Input()
@@ -77,15 +80,15 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [];
 
   // Actions
-  @Output() tableRowAction: EventEmitter<SelectedTableRowActionEvent> = new EventEmitter<
+  @Output() tableRowAction: EventEmitter<
     SelectedTableRowActionEvent
-  >();
+  > = new EventEmitter<SelectedTableRowActionEvent>();
 
   // Sort
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   // Filter
-  currentColFilter = '';
+  currentColFilter = "";
 
   // Selection
   selection: SelectionModel<any>;
@@ -104,7 +107,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
     // add the 'select' column, if enabled
     if (this._allowRowSelection) {
-      this._columnsToDisplay.unshift('select');
+      this._columnsToDisplay.unshift("select");
       this.displayedColumns = this._columnsToDisplay.slice();
     }
   }
@@ -128,27 +131,25 @@ export class TableComponent implements OnInit, AfterViewInit {
     return this._defaultSelected;
   }
 
-  @Output() rowSelectionChange: EventEmitter<SelectedTableRowEvent> = new EventEmitter<
+  @Output() rowSelectionChange: EventEmitter<
     SelectedTableRowEvent
-  >();
+  > = new EventEmitter<SelectedTableRowEvent>();
 
   // Paginator
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   // ------------------------------ Init ------------------------------
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this.dataSource = new MatTableDataSource(this.tableData);
-
     // init columns
     this.updateColumns();
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
-
     // need to add MatSort and MatPaginator when using MatTableDataSource
     this.dataSource.sort = this.sort;
 
@@ -158,15 +159,12 @@ export class TableComponent implements OnInit, AfterViewInit {
 
       // allow bulk column filtering with semi-colon, delimited string; takes care of every case
       // compact() removes any falsey values (i.e. - '')
-      const bulkColFilterValues = _.compact(filter.split(';'));
+      const bulkColFilterValues = _.compact(filter.split(";"));
 
       const val = data[this.currentColFilter];
-      const formattedVal = val
-        .toString()
-        .trim()
-        .toLowerCase();
+      const formattedVal = val.toString().trim().toLowerCase();
 
-      matched = bulkColFilterValues.some(v => formattedVal.includes(v));
+      matched = bulkColFilterValues.some((v) => formattedVal.includes(v));
 
       return !filter || matched;
     };
@@ -176,7 +174,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   // Update all references to columns
   updateColumns() {
-    const updColumns: string[] = this.allowRowSelection ? ['select'] : [];
+    const updColumns: string[] = this.allowRowSelection ? ["select"] : [];
 
     _.forEach(this.tableOptions.columns, (column: TableColumn) => {
       updColumns.push(column.key);
@@ -212,7 +210,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   // ------------------------------ Handle Sorting ------------------------------
 
   // Sort the data based on the specified column
-  sortColumn(columnKey: string, sortOrder?: 'asc' | 'desc') {
+  sortColumn(columnKey: string, sortOrder?: "asc" | "desc") {
     const matSort = this.dataSource.sort;
     const disableClear = false;
 
@@ -220,7 +218,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     matSort.sort({
       id: columnKey,
       start: sortOrder,
-      disableClear: disableClear
+      disableClear: disableClear,
     });
 
     this.dataSource.sort = matSort;
@@ -230,18 +228,22 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   // Get all column filter options by default if showing
   getFilterOptions(columnKey: string) {
-    const allColValues = _.map(this.dataSource.data, row => {
-      const cellVal = !row[columnKey] && row[columnKey] !== 0 ? '' : row[columnKey];
+    const allColValues = _.map(this.dataSource.data, (row) => {
+      const cellVal =
+        !row[columnKey] && row[columnKey] !== 0 ? "" : row[columnKey];
       return cellVal;
     });
 
-    const uniqueColValues = allColValues.filter((val, i, arr) => arr.indexOf(val) === i);
+    const uniqueColValues = allColValues.filter(
+      (val, i, arr) => arr.indexOf(val) === i
+    );
 
-    const filterOptions = _.map(uniqueColValues, val => {
+    const filterOptions = _.map(uniqueColValues, (val) => {
       return {
-        name: typeof val === 'number' ? val.toString() : val.trim().toLowerCase(),
+        name:
+          typeof val === "number" ? val.toString() : val.trim().toLowerCase(),
         value: val,
-        checked: false
+        checked: false,
       };
     });
 
@@ -257,7 +259,9 @@ export class TableComponent implements OnInit, AfterViewInit {
       (column: TableColumn) => column.key === columnKey
     );
 
-    const foundOption = foundCol.filterOptions.find(option => option.value === value);
+    const foundOption = foundCol.filterOptions.find(
+      (option) => option.value === value
+    );
 
     foundOption.checked = checked;
     this.applyColumnFilter(null, columnKey, foundCol.filterOptions);
@@ -271,28 +275,22 @@ export class TableComponent implements OnInit, AfterViewInit {
   ) {
     this.clearAllOtherColumnFilterValues(columnKey);
 
-    this.currentColFilter = columnKey || '';
-    let filterValue = '';
+    this.currentColFilter = columnKey || "";
+    let filterValue = "";
 
     // prepare the bulk filter values
     if (bulkColFilterValues.length > 0) {
-      let updVals = _.map(bulkColFilterValues, filterVal => {
+      let updVals = _.map(bulkColFilterValues, (filterVal) => {
         if (filterVal.checked) {
-          return filterVal.value
-            .toString()
-            .trim()
-            .toLowerCase();
+          return filterVal.value.toString().trim().toLowerCase();
         }
       });
-      updVals = updVals.filter(val => val && val !== '');
-      filterValue = _.join(updVals, ';');
+      updVals = updVals.filter((val) => val && val !== "");
+      filterValue = _.join(updVals, ";");
     } else {
       // continue with filter input value
-      const updVal = $event ? ($event.target as HTMLInputElement).value : '';
-      filterValue = updVal
-        .toString()
-        .trim()
-        .toLowerCase();
+      const updVal = $event ? ($event.target as HTMLInputElement).value : "";
+      filterValue = updVal.toString().trim().toLowerCase();
     }
 
     this.dataSource.filter = filterValue;
@@ -311,7 +309,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   clearAllOtherColumnFilterValues(columnKey: string) {
     _.forEach(this.tableOptions.columns, (column: TableColumn) => {
       if (column.key !== columnKey) {
-        column.filterValue = '';
+        column.filterValue = "";
 
         if (column.showFilterOptions) {
           _.forEach(column.filterOptions, (option: FilterOption) => {
@@ -327,7 +325,8 @@ export class TableComponent implements OnInit, AfterViewInit {
   // Whether the number of selected elements matches the total number of rows
   isAllSelected(): boolean {
     const nothingToSelect: boolean =
-      _.isEmpty(this.dataSource.data) || _.isEmpty(this.dataSource.filteredData);
+      _.isEmpty(this.dataSource.data) ||
+      _.isEmpty(this.dataSource.filteredData);
     const numOfSelected = this.selection.selected.length;
     const numOfRows = this.dataSource.filteredData.length;
 
@@ -346,13 +345,15 @@ export class TableComponent implements OnInit, AfterViewInit {
         this.selection.clear();
       }
     } else {
-      _.forEach(this.dataSource.filteredData, row => this.selection.select(row));
+      _.forEach(this.dataSource.filteredData, (row) =>
+        this.selection.select(row)
+      );
     }
 
     // This will emit the selection change event and all currently selected rows
     this.rowSelectionChange.emit({
       changeEvent: $event,
-      allSelectedRows: this.selection.selected
+      allSelectedRows: this.selection.selected,
     });
   }
 
@@ -363,7 +364,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     // This will emit the selection change event and all currently selected rows
     this.rowSelectionChange.emit({
       changeEvent: $event,
-      allSelectedRows: this.selection.selected
+      allSelectedRows: this.selection.selected,
     });
   }
 
@@ -379,7 +380,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     this.tableRowAction.emit({
       index: rowIndex,
       data: row,
-      rowAction: action
+      rowAction: action,
     });
   }
 

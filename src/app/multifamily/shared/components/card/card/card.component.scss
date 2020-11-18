@@ -1,0 +1,40 @@
+.mat-card.mf-card {
+    padding: 24px;
+    border-radius: 4px;
+
+    &.mf-card-expandable {
+        .mf-card-title-group>div {
+            margin-left: 26px;
+        }
+    }
+
+    .mf-card-title-group {
+        .mf-expansion-indicator {
+            position: absolute;
+            margin-left: -8px;
+        }
+    }
+
+    .mat-divider-horizontal.mat-divider-inset {
+        margin: 24px 0;
+    }
+
+    .mf-card-title-group,
+    .mf-card-content {
+        margin-bottom: 0;
+    }
+
+    .mf-card-title-group+.mf-card-content {
+        padding-top: 24px;
+    }
+
+    &:not(.display-with-dividers) {
+        .mf-card-content:not(:last-child) {
+            padding-bottom: 24px;
+        }
+    }
+
+    .mf-card-footer {
+        margin: 0;
+    }
+}

@@ -1,14 +1,23 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
-import { QuoteSearchQueryResults, Opportunity, SearchType } from '../../models/quote-search.model';
-import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
-import { QuoteSearchService } from '../../quote-search.service';
+import { Component, OnInit, Input } from "@angular/core";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  filter,
+} from "rxjs/operators";
+import {
+  QuoteSearchQueryResults,
+  Opportunity,
+  SearchType,
+} from "../../models/quote-search.model";
+import { FormControl } from "@angular/forms";
+import { Router } from "@angular/router";
+import { QuoteSearchService } from "../../quote-search.service";
 
 @Component({
-  selector: 'mf-pe-quote-search',
-  templateUrl: './quote-search.component.html',
-  styleUrls: ['./quote-search.component.scss']
+  selector: "mf-pe-quote-search",
+  templateUrl: "./quote-search.component.html",
+  styleUrls: ["./quote-search.component.scss"],
 })
 export class QuoteSearchComponent implements OnInit {
   opportunities: Opportunity[]; //Should this class be "PEOpportunity" or some other descriptive term?
@@ -24,7 +33,7 @@ export class QuoteSearchComponent implements OnInit {
   @Input() minimumTextCharacters = 5;
   @Input() label =
     'Prefix with "Q" for Quote ID, "O" for Opportunity ID, "L" for Loan ID, or enter a Property Name';
-  @Input() placeholder = 'Ex. Q945, O100, L211, Creek Apartments';
+  @Input() placeholder = "Ex. Q945, O100, L211, Creek Apartments";
 
   typeAheadVisible: boolean;
 
@@ -34,15 +43,26 @@ export class QuoteSearchComponent implements OnInit {
   validOpportunityQueryRegex: RegExp;
   validLoanQueryRegex: RegExp;
 
-  constructor(private quoteSearchService: QuoteSearchService, private router: Router) { }
+  constructor(
+    private quoteSearchService: QuoteSearchService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Had these in the constructor. I moved them here incase the Input for minimumCharacters ever had reason to be used.
     // /(o|O|q|Q|l|L)\d{3}/
-    this.validQOLQueryRegex = new RegExp(`(o|O|q|Q|l|L)\\d{${this.minimumIdCharacters}}`);
-    this.validQuoteQueryRegex = new RegExp(`(q|Q)\\d{${this.minimumIdCharacters}}`);
-    this.validOpportunityQueryRegex = new RegExp(`(o|O)\\d{${this.minimumIdCharacters}}`);
-    this.validLoanQueryRegex = new RegExp(`(l|L)\\d{${this.minimumIdCharacters}}`);
+    this.validQOLQueryRegex = new RegExp(
+      `(o|O|q|Q|l|L)\\d{${this.minimumIdCharacters}}`
+    );
+    this.validQuoteQueryRegex = new RegExp(
+      `(q|Q)\\d{${this.minimumIdCharacters}}`
+    );
+    this.validOpportunityQueryRegex = new RegExp(
+      `(o|O)\\d{${this.minimumIdCharacters}}`
+    );
+    this.validLoanQueryRegex = new RegExp(
+      `(l|L)\\d{${this.minimumIdCharacters}}`
+    );
 
     this.subscribeToSearch();
   }
@@ -73,7 +93,7 @@ export class QuoteSearchComponent implements OnInit {
         (results: QuoteSearchQueryResults) => {
           this.acceptResults(results);
         },
-        error => {
+        (error) => {
           //Future Enhancements: Provide feedback to the user based on the type of error.
           //e.g. "Internal Error" vs "No quotes found with that ID"
           this.subscribeToSearch();
@@ -83,13 +103,13 @@ export class QuoteSearchComponent implements OnInit {
 
   shouldBeFiltered(query: string): boolean {
     if (this.validQuoteQueryRegex.test(query)) {
-      this.searchType = 'quote';
+      this.searchType = "quote";
     } else if (this.validOpportunityQueryRegex.test(query)) {
-      this.searchType = 'opportunity';
+      this.searchType = "opportunity";
     } else if (this.validLoanQueryRegex.test(query)) {
-      this.searchType = 'loan';
+      this.searchType = "loan";
     } else if (query.length >= 5) {
-      this.searchType = 'property';
+      this.searchType = "property";
     } else {
       return true;
     }
