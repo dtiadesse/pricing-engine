@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 import * as _ from "lodash";
+import { of } from "rxjs";
 import { MOCK_PIPELINE_RESULTS } from "../mocks/pipeline-management.mocks";
 
 @Injectable({
@@ -27,22 +28,22 @@ export class PipelineManagementService {
 
   // This will fetch and return the matching PropertySearchQueryResults results
   getPipelineResults(): Observable<any> {
-    return MOCK_PIPELINE_RESULTS;
+    return of(MOCK_PIPELINE_RESULTS);
   }
 
   // Claim the Opportunity
   claim(opportunityId: number, claimType: string): Observable<any> {
-    return MOCK_PIPELINE_RESULTS;
+    return of(MOCK_PIPELINE_RESULTS);
   }
 
   // Get opportunity detalis
   getOpportunityDetails(opportunityId: number): Observable<any> {
-    return MOCK_PIPELINE_RESULTS;
+    return of(MOCK_PIPELINE_RESULTS);
   }
 
   // Approval hold of an Opportunity
   approvalHold(oppId: number, approvalType: string): Observable<any> {
-    return MOCK_PIPELINE_RESULTS;
+    return of(MOCK_PIPELINE_RESULTS);
   }
 
   // This will handle any errors that may occur
