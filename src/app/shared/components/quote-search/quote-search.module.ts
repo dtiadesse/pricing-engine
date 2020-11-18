@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { QuoteSearchComponent } from "../quote-search/component/quote-search-bar/quote-search-bar.component";
 
 import { ReactiveFormsModule } from "@angular/forms";
 // import { MatIconModule, MatInputModule, MatAutocompleteModule } from '@angular/material';
@@ -10,7 +9,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
-  declarations: [QuoteSearchComponent, SearchResultComponent],
+  declarations: [SearchResultComponent],
   imports: [
     CommonModule,
     MatAutocompleteModule,
@@ -18,6 +17,6 @@ import { MatInputModule } from "@angular/material/input";
     MatInputModule,
     ReactiveFormsModule,
   ],
-  exports: [QuoteSearchComponent],
+  exports: [],
 })
 export class QuoteSearchModule {}

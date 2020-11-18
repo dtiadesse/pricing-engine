@@ -3,8 +3,9 @@ import { CommonModule } from "@angular/common";
 
 import { MatIconModule } from "@angular/material/icon";
 import { CustomTooltipDirective } from "../../../shared/components/custom-tooltip/directive/custom-tooltip-directive";
-import { ToolTipTemplateComponent } from "../../components/custom-tooltip/components/tooltip-template/tooltip-template";
+
 import { CustomTooltipComponent } from "./components/custom-tooltip/custom-tooltip.component";
+import { ToolTipTemplateComponent } from "./components/tooltip-template/tooltip-template.component";
 
 @NgModule({
   declarations: [

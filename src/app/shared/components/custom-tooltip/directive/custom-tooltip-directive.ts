@@ -14,7 +14,7 @@ import {
   OverlayRef,
 } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
-import { ToolTipTemplateComponent } from "../components/tooltip-template/tooltip-template";
+import { ToolTipTemplateComponent } from "../components/tooltip-template/tooltip-template.component";
 
 @Directive({
   /* tslint:disable */

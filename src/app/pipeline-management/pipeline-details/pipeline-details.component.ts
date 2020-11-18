@@ -85,7 +85,7 @@ export class PipelineDetailsComponent implements OnInit {
 
   constructor(
     private pipelineService: PipelineManagementService,
-    private notification: any,
+    // private notification: any,
     public dialog: MatDialog
   ) {}
 
@@ -218,12 +218,12 @@ export class PipelineDetailsComponent implements OnInit {
   postApprovalHoldRequest(opportunityId: number, approvalType: string) {
     this.pipelineService.approvalHold(opportunityId, approvalType).subscribe(
       (res: any) => {
-        this.notification.openSnackBar("success", res.message, 4000);
+        //  this.notification.openSnackBar("success", res.message, 4000);
         if (res) {
           this.getPipelineResults();
         }
-      },
-      (error) => this.notification.openSnackBar("error", error, 4000)
+      }
+      // (error) => this.notification.openSnackBar("error", error, 4000)
     );
   }
 
@@ -271,12 +271,12 @@ export class PipelineDetailsComponent implements OnInit {
   claimQuotes(opportunityId: number, claimType: string) {
     this.pipelineService.claim(opportunityId, claimType).subscribe(
       (res: any) => {
-        this.notification.openSnackBar("success", res.message, 4000);
+        // this.notification.openSnackBar("success", res.message, 4000);
         if (res) {
           this.getPipelineResults();
         }
-      },
-      (error) => this.notification.openSnackBar("error", error, 4000)
+      }
+      //(error) => this.notification.openSnackBar("error", error, 4000)
     );
   }
 
