@@ -2,6 +2,8 @@
     <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
         <ng-container mf-card-title-group-action>
             <div>
+                <button mat-raised-button
+                            (click)="toggle()">{{allRowsExpanded ? 'Collapse' : 'Expand'}}</button>
                 <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
                     <mat-icon class="material-icons-outlined">refresh</mat-icon>
                 </button>
@@ -21,7 +23,7 @@
                             <ng-template matTabContent>
                                 <div class="mt-4" *ngIf="tab.content?.length">
                                     <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
-                                        [tableData]="tab.content" [tableOptions]="tab.tableOptions">
+                                        [tableData]="tab.content" [tableOptions]="tab.tableOptions" [expandAllRows]="allRowsExpanded" expandedRow="expandedRow">
                                         <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
                                             <ng-container *ngIf="
                                 column.key === 'submitDateTime' ||
@@ -44,11 +46,8 @@
                                                         <div class="row">
                                                             <mat-icon *ngIf="row.quoteResults.length > 0"
                                                                 [id]="'pipelineResultsTableRow-' + row.opportunityId"
-                                                                class="mf-expansion-indicator mx-2" (click)="
-                                        pipelineResultsTable.expandedRow =
-                                          pipelineResultsTable.expandedRow === row ? null : row
-                                      " [@expansionIndicatorRotate]="
-                                        row == pipelineResultsTable.expandedRow
+                                                                class="mf-expansion-indicator mx-2" (click)="toggleOnRotate(index, row)" [@expansionIndicatorRotate]="
+                                       row.expanded
                                           ? 'expanded'
                                           : 'collapsed'
                                       "> expand_more</mat-icon>

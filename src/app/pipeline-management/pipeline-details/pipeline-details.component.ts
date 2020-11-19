@@ -79,8 +79,10 @@ export class PipelineDetailsComponent implements OnInit {
   quoteResultsTableOptions: TableOptions;
   approvalTableOptions: TableOptions;
   @ViewChild("tabGroup", { static: false }) tabGroup: any;
+  @ViewChild("pipelineResultsTable") pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   errorMessage: string;
+  allRowsExpanded: boolean = false;
   // ------------------------------ Init ------------------------------
 
   constructor(
@@ -88,6 +90,16 @@ export class PipelineDetailsComponent implements OnInit {
     // private notification: any,
     public dialog: MatDialog
   ) {}
+
+  public toggle() {
+    this.allRowsExpanded = !this.allRowsExpanded;
+    // this.pipelineResultsTableRef.nativeElement.expandedRow = null;
+    console.log(
+      this.pipelineResultsTableRef,
+      "ref",
+      this.tableComponent.expandedRow
+    );
+  }
 
   ngOnInit() {
     if (this.pipelineService.userId) {
@@ -137,6 +149,17 @@ export class PipelineDetailsComponent implements OnInit {
       });
     }
     return count;
+  }
+
+  toggleOnRotate(i) {
+    this.pipelineResultsTableRef["_tableData"] = _.map(this.pipelineResultsTableRef["_tableData"], (value: any, index: number) => {
+      if (index == i) {
+        value.expanded = !value.expanded;
+      } else {
+        value.expanded = false;
+      }
+      return value;
+    });
   }
 
   //------------- Get pipeline Results--------------
