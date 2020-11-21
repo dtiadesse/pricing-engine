@@ -1,27 +1,36 @@
 <ng-container *ngIf="(asyncTabs | async) !== null">
     <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
         <ng-container mf-card-title-group-action>
-            <div>
-                <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
-                    <mat-icon class="material-icons-outlined">refresh</mat-icon>
-                </button>
-                <span id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
+            <div class="row mx-0 mt-2">
+
+                <mat-checkbox id="showMyQuotesChkbox" name="showMyQuotesChkbox" color="primary" disableRipple="true"
+                    (change)="onShowMyQuoteChange($event)" [checked]="showMyQuotes">Show my quotes</mat-checkbox>
+
+                <mat-checkbox id="expandAllChkbox" name="expandAllChkbox" color="primary" disableRipple="true"
+                    (change)="onExpandAllChkboxChange($event)" [checked]="expandAll">Expand all rows</mat-checkbox>
+
+                <div class="mx-1"> <button mat-icon-button color="primary" id="refreshBtn"
+                        (click)="getPipelineResults()">
+                        <mat-icon class="material-icons-outlined">refresh</mat-icon>
+                    </button>
+                    <span class="pt-1" id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
+                </div>
+
             </div>
         </ng-container>
-
         <ng-container mf-card-content>
             <div class="row mx-0 ">
                 <div class="col px-0">
                     <mat-tab-group class="mf-tab-group" animationDuration="0ms" color="primary" disableRipple="true">
-                        <mat-tab class="mf-tab-label mf darker" [id]="tab.label"
-                            *ngFor="let tab of (asyncTabs | async); let i = index">
+                        <mat-tab class="mf-tab-label mf darker" *ngFor="let tab of (asyncTabs | async); let i = index">
                             <ng-template mat-tab-label>{{ tab.label }} (O-{{ tab.content.length }},
                                 Q-{{tab.quoteCount}})
                             </ng-template>
                             <ng-template matTabContent>
                                 <div class="mt-4" *ngIf="tab.content?.length">
                                     <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
-                                        [tableData]="tab.content" [tableOptions]="tab.tableOptions">
+                                        [tableData]="tab.content" [expandAllRows]="allRowsExpanded"
+                                        expandedRow="expandedRow" [tableOptions]="tab.tableOptions">
                                         <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
                                             <ng-container *ngIf="
                                 column.key === 'submitDateTime' ||
@@ -44,11 +53,10 @@
                                                         <div class="row">
                                                             <mat-icon *ngIf="row.quoteResults.length > 0"
                                                                 [id]="'pipelineResultsTableRow-' + row.opportunityId"
-                                                                class="mf-expansion-indicator mx-2" (click)="
-                                        pipelineResultsTable.expandedRow =
-                                          pipelineResultsTable.expandedRow === row ? null : row
-                                      " [@expansionIndicatorRotate]="
-                                        row == pipelineResultsTable.expandedRow
+                                                                class="mf-expansion-indicator mx-2"
+                                                                (click)="toogleOnRotate(index, row)"
+                                                                [@expansionIndicatorRotate]="
+                                        row.expanded
                                           ? 'expanded'
                                           : 'collapsed'
                                       "> expand_more</mat-icon>
@@ -119,62 +127,11 @@
                                     else: defaultCell
                                   ">
                                                             <ng-container *ngIf="row[column.key]; else: defaultCell">
-                                                                <div *ngIf="column.key === 'quoteId'" class="row">
-                                                                    <ng-template #pipelineQuoteInfoTemplate>
-                                                                        <mat-card>
-                                                                            <div
-                                                                                class="mf-tabular-list-container container-fluid h-100">
-                                                                                <div class="mf-tabular-list-col">
-                                                                                    <mat-list role="list"
-                                                                                        class="mf-tabular-list mf-highly-condensed-rows">
-                                                                                        <mat-divider></mat-divider>
-                                                                                        <mat-list-item
-                                                                                            class="mf-tabular-list-item"
-                                                                                            role="listitem">
-                                                                                            <span
-                                                                                                id="previously-submitted-to-ho-label"
-                                                                                                class="mf-tabular-list-item-label mf body-small w600 darker"
-                                                                                                aria-label="Tabular list label text">Previously
-                                                                                                submitted to HO</span>
-                                                                                            <span
-                                                                                                id="previously-submitted-to-ho"
-                                                                                                class="mf-tabular-list-item-value mf body-small right px-5">
-                                                                                                {{ row.pricedBefore === 'Y' ? 'Yes' : 'No' }}
-                                                                                            </span>
-                                                                                        </mat-list-item>
-                                                                                        <mat-divider></mat-divider>
-                                                                                        <mat-list-item
-                                                                                            class="mf-tabular-list-item"
-                                                                                            role="listitem">
-                                                                                            <div mat-line>
-                                                                                                <span
-                                                                                                    id="producercomment-label"
-                                                                                                    class="mf-tabular-list-item-label mf body-small w600 darker"
-                                                                                                    aria-label="Tabular list label text">Producer's
-                                                                                                    comment:</span>
-                                                                                            </div>
-                                                                                            <div mat-line>
-                                                                                                <span
-                                                                                                    id="producercomment-label"
-                                                                                                    class="mf-tabular-list-item-value mf body-small"
-                                                                                                    aria-label="Tabular list label text">
-                                                                                                    {{row.requestHomeOfficeTriggerReasonText }}
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        </mat-list-item>
-                                                                                    </mat-list>
-                                                                                </div>
-                                                                            </div>
-                                                                        </mat-card>
-                                                                    </ng-template>
-                                                                    <mf-pe-custom-tooltip
-                                                                        [contentTemplate]="pipelineQuoteInfoTemplate">
-                                                                    </mf-pe-custom-tooltip>
-                                                                    <span class="cell-value mf-link mf-navigation-link"
-                                                                        id="quote-{{row[column.key]}}"
-                                                                        (click)="navigateTo(row[column.key])">
-                                                                        {{ row[column.key] }} </span>
-                                                                </div>
+                                                                <span *ngIf="column.key === 'quoteId'"
+                                                                    class="cell-value mf-link mf-navigation-link"
+                                                                    id="quote-{{row[column.key]}}"
+                                                                    (click)="navigateTo(row[column.key])">
+                                                                    {{ row[column.key] }} </span>
                                                                 <div *ngIf="column.key === 'submitDateTime'"
                                                                     class="cell-value"
                                                                     [matTooltip]="row[column.key] | date: 'MM/dd/yyyy h:mm a'"
@@ -195,12 +152,15 @@
                                                             </ng-container>
                                                         </ng-container>
                                                         <ng-template #defaultCell>
-                                                            <div class="cell-value mf" [matTooltip]="row[column.key]"
-                                                                [matTooltipClass]="'mf-tooltip'"
-                                                                aria-label="default cell text that displays a tooltip when focused or hovered over"
+                                                            <div class="cell-value mf" [ngClass]="{
+                                      right: column.cellValueType === 'currency_int',
+                                      'darker w600': column.key.includes('Name')
+                                    }" [matTooltip]="row[column.key]" [matTooltipClass]="'mf-tooltip'"
+                                                                aria-label="Output Grid cell text that displays a tooltip when focused or hovered over"
                                                                 mfPeShowTooltipIfTruncated> {{
-                                      
-                                        (row[column.key] | emptyValue)
+                                      column.cellValueType === 'currency_int'
+                                        ? (row[column.key] | emptyValue: '0')
+                                        : (row[column.key] | emptyValue)
                                     }} </div>
                                                         </ng-template>
                                                     </ng-template>

@@ -32,7 +32,6 @@ import {
   TableOptions,
   TableRowAction,
 } from "../model/table.model";
-
 @Component({
   selector: "mf-pe-table",
   templateUrl: "./table.component.html",
@@ -57,9 +56,8 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   // Custom Cells
-  @ContentChild("cellTemplate", { static: false }) cellTemplateRef: TemplateRef<
-    any
-  >;
+  @ContentChild("cellTemplate", { static: false })
+  cellTemplateRef: TemplateRef<any>;
 
   // Expanded Rows
   @ContentChild("masterDetailTemplate", { static: false })
@@ -80,9 +78,8 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [];
 
   // Actions
-  @Output() tableRowAction: EventEmitter<
-    SelectedTableRowActionEvent
-  > = new EventEmitter<SelectedTableRowActionEvent>();
+  @Output()
+  tableRowAction: EventEmitter<SelectedTableRowActionEvent> = new EventEmitter<SelectedTableRowActionEvent>();
 
   // Sort
   @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -131,9 +128,8 @@ export class TableComponent implements OnInit, AfterViewInit {
     return this._defaultSelected;
   }
 
-  @Output() rowSelectionChange: EventEmitter<
-    SelectedTableRowEvent
-  > = new EventEmitter<SelectedTableRowEvent>();
+  @Output()
+  rowSelectionChange: EventEmitter<SelectedTableRowEvent> = new EventEmitter<SelectedTableRowEvent>();
 
   // Paginator
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

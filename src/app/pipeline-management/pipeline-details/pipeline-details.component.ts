@@ -6,17 +6,13 @@ import * as _ from "lodash";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
 // Shared
-// import {
-//   expansionIndicatorRotate,
-//   SnackbarService,
-// } from "@Multifamily/shared/components";
 
 // Services
 import { PipelineManagementService } from "../../services/pipeline-management.service";
 
 // Components
 import { StatusDialogComponent } from "../../shared/components/status-modal/status.modal.component";
-// "../../../../shared/components/status-modal/status-modal.component";
+
 import { TableComponent } from "../../shared/components/table/table/table.component";
 
 // Models
@@ -29,6 +25,7 @@ import {
   QUOTE_RESULTS_COLUMN_METADATA,
   QUOTE_RESULTS_EXTENSION_COLUMN_METADATA,
 } from "./pipeline.constant";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 import {
   TableOptions,
   TableColumn,
@@ -39,7 +36,6 @@ import { StatusModalMeta } from "../../shared/components/status-modal/status-mod
 export interface PipelineTab {
   label?: string;
   content: any[];
-  index?: number;
   tableOptions?: TableOptions;
   quoteTableOptions?: TableOptions;
   quoteCount?: number;
@@ -52,7 +48,7 @@ export interface PipelineTab {
   animations: [expansionIndicatorRotate],
 })
 export class PipelineDetailsComponent implements OnInit {
-  quotes: any = {
+  pipelineResults: any = {
     newQuotes: [],
     extensionQuotes: [],
     awaitingApprovalQuotes: [],
@@ -79,13 +75,15 @@ export class PipelineDetailsComponent implements OnInit {
   quoteResultsTableOptions: TableOptions;
   approvalTableOptions: TableOptions;
   @ViewChild("tabGroup", { static: false }) tabGroup: any;
+  @ViewChild("pipelineResultsTable", { static: true })
+  pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
-  errorMessage: string;
+  allRowsExpanded: boolean = false;
   // ------------------------------ Init ------------------------------
-
+  expandedRow;
   constructor(
     private pipelineService: PipelineManagementService,
-    // private notification: any,
+    //private notification: SnackbarService,
     public dialog: MatDialog
   ) {}
 
@@ -128,6 +126,74 @@ export class PipelineDetailsComponent implements OnInit {
     return quoteResults;
   }
 
+  onExpandAllChkboxChange(ev: MatCheckboxChange) {
+    this.allRowsExpanded = !this.allRowsExpanded;
+  }
+  toogleOnRotate(i, row) {
+    this.pipelineResultsTableRef["_tableData"] = _.map(
+      this.pipelineResultsTableRef["_tableData"],
+      (value: any, index: number) => {
+        if (index === i) {
+          value.expanded = !value.expaded;
+        } else {
+          value.expaded = false;
+        }
+        return value;
+      }
+    );
+  }
+
+  onShowMyQuoteChange(ev: MatCheckboxChange) {
+    let filterQuotes: any = {
+      newQuotes: [],
+      extensionQuotes: [],
+      awaitingApprovalQuotes: [],
+      results: null,
+      approvalLimit: this.pipelineResults.approvalLimit,
+      userId: this.currentUserId,
+    };
+    const userId = this.pipelineService.userId;
+    if (ev.checked) {
+      filterQuotes.newQuotes = this.pipelineResults.newQuotes.filter(
+        (x: any) => x.claimedByUserId === userId
+      );
+      filterQuotes.extensionQuotes = this.pipelineResults.extensionQuotes.filter(
+        (x: any) => x.claimedByUserId === userId
+      );
+      filterQuotes.awaitingApprovalQuotes = this.pipelineResults.awaitingApprovalQuotes.filter(
+        (x: any) => x.claimedByUserId === userId
+      );
+    } else {
+      filterQuotes = this.pipelineResults;
+    }
+
+    this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+      observer.next([
+        {
+          label: "New",
+          content: this.getQuotes(filterQuotes.newQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(filterQuotes.newQuotes),
+        },
+        {
+          label: "Extension",
+          content: this.getQuotes(filterQuotes.extensionQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(filterQuotes.extensionQuotes),
+        },
+        {
+          label: "Awaiting Approval",
+          content: this.getQuotes(filterQuotes.awaitingApprovalQuotes),
+          tableOptions: this.approvalTableOptions,
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(filterQuotes.awaitingApprovalQuotes),
+        },
+      ]);
+    });
+  }
+
   //--------------- To get the quote count of the each Opportunity -------------------
   getQuoteCount(items: any) {
     let count = 0;
@@ -142,32 +208,35 @@ export class PipelineDetailsComponent implements OnInit {
   //------------- Get pipeline Results--------------
   getPipelineResults() {
     this.pipelineService.getPipelineResults().subscribe((data: any) => {
-      this.quotes = data;
+      this.pipelineResults = data;
       this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
         observer.next([
           {
             label: "New",
-            content: this.getQuotes(this.quotes.newQuotes),
-            index: 0,
+            content: this.getQuotes(this.pipelineResults.newQuotes),
             tableOptions: this.defaultTableOptions,
             quoteTableOptions: this.quoteResultsTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.newQuotes),
+            quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
           },
           {
             label: "Extension",
-            content: this.getQuotes(this.quotes.extensionQuotes),
-            index: 1,
+            content: this.getQuotes(this.pipelineResults.extensionQuotes),
             tableOptions: this.defaultTableOptions,
             quoteTableOptions: this.quoteResultsExtensionTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.extensionQuotes),
+            quoteCount: this.getQuoteCount(
+              this.pipelineResults.extensionQuotes
+            ),
           },
           {
             label: "Awaiting Approval",
-            content: this.getQuotes(this.quotes.awaitingApprovalQuotes),
-            index: 2,
+            content: this.getQuotes(
+              this.pipelineResults.awaitingApprovalQuotes
+            ),
             tableOptions: this.approvalTableOptions,
             quoteTableOptions: this.quoteResultsApprovalTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.awaitingApprovalQuotes),
+            quoteCount: this.getQuoteCount(
+              this.pipelineResults.awaitingApprovalQuotes
+            ),
           },
         ]);
         this.lastUpdated = new Date();
@@ -218,12 +287,13 @@ export class PipelineDetailsComponent implements OnInit {
   postApprovalHoldRequest(opportunityId: number, approvalType: string) {
     this.pipelineService.approvalHold(opportunityId, approvalType).subscribe(
       (res: any) => {
-        //  this.notification.openSnackBar("success", res.message, 4000);
+        //this.notification.openSnackBar("success", res.message, 4000);
         if (res) {
           this.getPipelineResults();
         }
-      }
-      // (error) => this.notification.openSnackBar("error", error, 4000)
+      },
+      (error) => console.log("test")
+      //this.notification.openSnackBar("error", error, 4000)
     );
   }
 
@@ -275,8 +345,8 @@ export class PipelineDetailsComponent implements OnInit {
         if (res) {
           this.getPipelineResults();
         }
-      }
-      //(error) => this.notification.openSnackBar("error", error, 4000)
+      },
+      (error) => console.log("error", error)
     );
   }
 
@@ -327,7 +397,7 @@ export class PipelineDetailsComponent implements OnInit {
         cellValueType: dc.dataValueType,
         cellTemplateClassName:
           dc.dataMappingName === "quoteId"
-            ? "mf-w-15"
+            ? "mf-w-10"
             : dc.dataMappingName === "opportunityUpbAmt"
             ? "mf-w-7"
             : dc.dataMappingName === "statusType"
