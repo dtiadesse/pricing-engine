@@ -36,7 +36,7 @@ describe("PipelineDetailsComponent", () => {
 
     const pipelineServiceStub: Partial<PipelineManagementService> = {
       getPipelineResults: jest.fn(() => of(mocks.pipelineResults)),
-      getOpportunityDetails: jest.fn(() => of(mocks.pipelineResults)),
+      getOpportunityDetails: jest.fn(() => of(mocks.opportunityDetails)),
       claim: jest.fn(() => of(mocks.success)),
       approvalHold: jest.fn(() => of(mocks.success)),
     };
@@ -100,7 +100,7 @@ describe("PipelineDetailsComponent", () => {
 
   it("should load the pipeline details", () => {
     component.getPipelineResults();
-    expect(component.quotes.newQuotes.length).toBe(4);
+    expect(component.pipelineResults.newQuotes.length).toBe(4);
   });
 
   it("should reload the pipeline results", () => {
@@ -119,7 +119,7 @@ describe("PipelineDetailsComponent", () => {
 
   it("should count the all quotes for the all opportunities", () => {
     mocks = mockPipelineResults();
-    const count = component.getQuoteCount(component.quotes.newQuotes);
+    const count = component.getQuoteCount(component.pipelineResults.newQuotes);
     expect(count).toBe(7);
   });
 
@@ -207,5 +207,19 @@ describe("PipelineDetailsComponent", () => {
     fixture.detectChanges();
 
     expect(snackbarSpy).toHaveBeenCalled();
+  });
+
+  // ------------------------------ Default Inputs ------------------------------
+
+  describe("expand all rows", () => {
+    it("Should not match the table data on expand on checkbox check", () => {
+      component.ngOnInit();
+      component.toogleOnRotate(2, "");
+      fixture.detectChanges();
+      const refdata = component.pipelineResultsTableRef["_tableData"];
+      expect(component.pipelineResultsTableRef["_tableData"]).toBe(
+        "tableRefData"
+      );
+    });
   });
 });
