@@ -75,7 +75,7 @@ export class PipelineDetailsComponent implements OnInit {
   quoteResultsTableOptions: TableOptions;
   approvalTableOptions: TableOptions;
   @ViewChild("tabGroup", { static: false }) tabGroup: any;
-  @ViewChild("pipelineResultsTable", { static: true })
+  @ViewChild("pipelineResultsTable", { static: false })
   pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   allRowsExpanded: boolean = false;
@@ -128,16 +128,21 @@ export class PipelineDetailsComponent implements OnInit {
 
   onExpandAllChkboxChange(ev: MatCheckboxChange) {
     this.allRowsExpanded = !this.allRowsExpanded;
+    this.pipelineResultsTableRef["_tableData"] = _.map(
+      this.pipelineResultsTableRef["_tableData"],
+      (value: any, index: number) => {
+        if (!this.allRowsExpanded) {
+          value.expanded = false;
+        }
+        return value;
+      }
+    );
   }
   toogleOnRotate(i, row) {
     this.pipelineResultsTableRef["_tableData"] = _.map(
       this.pipelineResultsTableRef["_tableData"],
       (value: any, index: number) => {
-        if (index === i) {
-          value.expanded = !value.expaded;
-        } else {
-          value.expaded = false;
-        }
+        value.expanded = (index === i) ? !value.expanded : false;
         return value;
       }
     );
