@@ -138,7 +138,7 @@ export class PipelineDetailsComponent implements OnInit {
       }
     );
   }
-  toogleOnRotate(i, row) {
+  toggleOnRotate(i) {
     this.pipelineResultsTableRef["_tableData"] = _.map(
       this.pipelineResultsTableRef["_tableData"],
       (value: any, index: number) => {

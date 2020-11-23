@@ -5,6 +5,7 @@ import { of, throwError } from "rxjs";
 // Material
 import { MatDialog } from "@angular/material/dialog";
 import { MatMenuModule } from "@angular/material/menu";
+import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 
 // Models
 import { SuccessResponse } from "../../../../models";
@@ -214,7 +215,21 @@ describe("PipelineDetailsComponent", () => {
   describe("expand all rows", () => {
     it("Should not match the table data on expand on checkbox check", () => {
       component.ngOnInit();
-      component.toogleOnRotate(2, "");
+      component.pipelineResultsTableRef["_tableData"] = [{}];
+      const mockEvent: any = {source: ""};
+      component.onExpandAllChkboxChange(mockEvent);
+      fixture.detectChanges();
+      const refdata = component.pipelineResultsTableRef["_tableData"];
+      expect(component.pipelineResultsTableRef["_tableData"]).toBe(
+        "tableRefData"
+      );
+    });
+  });
+  describe("expand a row", () => {
+    it("Should toggle a row data", () => {
+      component.ngOnInit();
+      component.pipelineResultsTableRef["_tableData"] = [{}, {}];
+      component.toggleOnRotate(2);
       fixture.detectChanges();
       const refdata = component.pipelineResultsTableRef["_tableData"];
       expect(component.pipelineResultsTableRef["_tableData"]).toBe(

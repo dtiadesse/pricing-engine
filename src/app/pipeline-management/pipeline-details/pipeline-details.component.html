@@ -54,7 +54,7 @@
                                                             <mat-icon *ngIf="row.quoteResults.length > 0"
                                                                 [id]="'pipelineResultsTableRow-' + row.opportunityId"
                                                                 class="mf-expansion-indicator mx-2"
-                                                                (click)="toogleOnRotate(index, row)"
+                                                                (click)="toggleOnRotate(index)"
                                                                 [@expansionIndicatorRotate]="
                                         row.expanded
                                           ? 'expanded'
