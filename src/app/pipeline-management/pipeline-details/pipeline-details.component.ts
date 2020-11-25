@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { Observable, Observer } from "rxjs";
+import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
+import { interval, Observable, Observer, Subscription } from "rxjs";
 import * as _ from "lodash";
 
 // Material
@@ -47,7 +47,7 @@ export interface PipelineTab {
   styleUrls: ["./pipeline-details.component.scss"],
   animations: [expansionIndicatorRotate],
 })
-export class PipelineDetailsComponent implements OnInit {
+export class PipelineDetailsComponent implements OnInit, OnDestroy {
   pipelineResults: any = {
     newQuotes: [],
     extensionQuotes: [],
@@ -56,6 +56,8 @@ export class PipelineDetailsComponent implements OnInit {
     userId: null,
     approvalLimit: null,
   };
+  
+  subscription: Subscription;
 
   defaultColMeta: any[] = _.clone(DEFAULT_PIPELINE_COLUMN_METADATA);
   approvalColMeta: any[] = _.clone(AwaitingApprovalData);
@@ -79,6 +81,7 @@ export class PipelineDetailsComponent implements OnInit {
   pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   allRowsExpanded: boolean = false;
+
   // ------------------------------ Init ------------------------------
   expandedRow;
   constructor(
@@ -113,8 +116,13 @@ export class PipelineDetailsComponent implements OnInit {
     this.quoteResultsApprovalTableOptions = _.cloneDeep(
       this.getTableOptions(this.quoteResultsApprovalColMeta, true)
     );
-
     this.getPipelineResults();
+    const source = interval(10000);
+    this.subscription = source.subscribe(() => this.getPipelineResults());
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   // ------------------------------ Table ------------------------------
