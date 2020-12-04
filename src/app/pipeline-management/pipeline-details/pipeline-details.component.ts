@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { Observable, Observer } from "rxjs";
+import { Observable, Observer, BehaviorSubject, concat, of, timer } from "rxjs";
+import { concatMapTo, switchMap } from "rxjs/operators";
 import * as _ from "lodash";
-
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 // Material
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
@@ -9,6 +10,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
 // Services
 import { PipelineManagementService } from "../../services/pipeline-management.service";
+import { pollingRequest } from "src/app/shared/utilities/polling-request";
 
 // Components
 import { StatusDialogComponent } from "../../shared/components/status-modal/status.modal.component";
@@ -91,12 +93,18 @@ export class PipelineDetailsComponent implements OnInit {
 
   overviewTabularDataApproval: TabularListItem[] = [];
   overviewMetadata: DataComponent[] = _.clone(OVERVIEW_METADATA);
+  pollingForRefresh$: Observable<PipelineResults[]>;
+  updPollingForRefresh$: BehaviorSubject<
+    PipelineResults[] | null
+  > = new BehaviorSubject<PipelineResults[] | null>(null);
+
 
   // ------------------------------ Init ------------------------------
   constructor(
     private pipelineService: PipelineManagementService,
     // private notification: SnackbarService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -126,7 +134,7 @@ export class PipelineDetailsComponent implements OnInit {
       this.getTableOptions(this.quoteResultsApprovalColMeta, true)
     );
 
-    this.getPipelineResults();
+    this.openPollingForRefresh();
   }
 
   // ------------------------------ Table ------------------------------
@@ -217,84 +225,113 @@ export class PipelineDetailsComponent implements OnInit {
     return count;
   }
 
+  getPipelineResults() {
+      this.pipelineService
+        .getPipelineResults()
+        .subscribe((data: PipelineResults) => {
+          this.pipelineResults = data;
+          this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+            observer.next([
+              {
+                label: "New",
+                content: this.getQuotes(this.pipelineResults.newQuotes),
+                tableOptions: this.defaultTableOptions,
+                quoteTableOptions: this.quoteResultsTableOptions,
+                quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+              },
+              {
+                label: "Extension",
+                content: this.getQuotes(this.pipelineResults.extensionQuotes),
+                tableOptions: this.defaultTableOptions,
+                quoteTableOptions: this.quoteResultsExtensionTableOptions,
+                quoteCount: this.getQuoteCount(
+                  this.pipelineResults.extensionQuotes
+                ),
+              },
+              {
+                label: "Awaiting Approval",
+                content: this.getQuotes(
+                  this.pipelineResults.awaitingApprovalQuotes
+                ),
+                tableOptions: this.approvalTableOptions,
+                quoteTableOptions: this.quoteResultsApprovalTableOptions,
+                quoteCount: this.getQuoteCount(
+                  this.pipelineResults.awaitingApprovalQuotes
+                ),
+              },
+            ]);
+            this.lastUpdated = new Date();
+          });
+          this.overviewTabularDataNew = this.setUpLists(
+            this.pipelineResults.pipelineStatistics.newQuotes
+          );
+          this.overviewTabularDataExtension = this.setUpLists(
+            this.pipelineResults.pipelineStatistics.extensionQuotes
+          );
+          this.overviewTabularDataApproval = this.setUpLists(
+            this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+          );
+        });
+        return this.pipelineService
+        .getPipelineResults();
+    }
+
   //------------- Get pipeline Results--------------
 
-  // This will set up our subscription to the getAllComments API to poll for updated comments
-  // //  private openPollingForCommentsStream() {
-  //     this.pollingForComments$ = this.updPollingForComments$.asObservable().pipe(
-  //       switchMap<IConversation[] | null, Observable<IConversation[]>>(
-  //         (updComments: IConversation[] | null) => {
-  //           const contextLineageObj: ConversationContextLineage = {
-  //             opportunityId: this.activeOpportunityId,
-  //             quoteId: this.activeQuoteId,
-  //           };
-
-  //           const pollingInterval = 30000;
-  //           const pollingStream$: Observable<IConversation[]> = pollingRequest(
-  //             this.commentsService.getAllComments(contextLineageObj),
-  //             pollingInterval
-  //           );
-  //           const delayedStream$ = timer(pollingInterval).pipe(
-  //             concatMapTo(pollingStream$)
-  //           );
-  //           return !!updComments
-  //             ? concat(of(updComments), delayedStream$)
-  //             : pollingStream$;
-  //         }
-  //       )
-  //     );
-
-  //     this.updPollingForComments$.next(null);
-  //  }
-
-  getPipelineResults() {
-    this.pipelineService
-      .getPipelineResults()
-      .subscribe((data: PipelineResults) => {
-        this.pipelineResults = data;
-        this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
-          observer.next([
-            {
-              label: "New",
-              content: this.getQuotes(this.pipelineResults.newQuotes),
-              tableOptions: this.defaultTableOptions,
-              quoteTableOptions: this.quoteResultsTableOptions,
-              quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
-            },
-            {
-              label: "Extension",
-              content: this.getQuotes(this.pipelineResults.extensionQuotes),
-              tableOptions: this.defaultTableOptions,
-              quoteTableOptions: this.quoteResultsExtensionTableOptions,
-              quoteCount: this.getQuoteCount(
-                this.pipelineResults.extensionQuotes
-              ),
-            },
-            {
-              label: "Awaiting Approval",
-              content: this.getQuotes(
-                this.pipelineResults.awaitingApprovalQuotes
-              ),
-              tableOptions: this.approvalTableOptions,
-              quoteTableOptions: this.quoteResultsApprovalTableOptions,
-              quoteCount: this.getQuoteCount(
-                this.pipelineResults.awaitingApprovalQuotes
-              ),
-            },
-          ]);
-          this.lastUpdated = new Date();
-        });
-        this.overviewTabularDataNew = this.setUpLists(
-          this.pipelineResults.pipelineStatistics.newQuotes
-        );
-        this.overviewTabularDataExtension = this.setUpLists(
-          this.pipelineResults.pipelineStatistics.extensionQuotes
-        );
-        this.overviewTabularDataApproval = this.setUpLists(
-          this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
-        );
-      });
-  }
+  // This will set up our subscription to the getPipelineResults API to poll for updated data
+   private openPollingForRefresh() {
+    const pollingInterval = 3000;
+    const pollingStream$ = pollingRequest(
+      this.pipelineService.getPipelineResults(),
+      pollingInterval
+    );
+    timer(1, pollingInterval).pipe(
+      concatMapTo(pollingStream$)
+    ).subscribe((data: PipelineResults) => {
+            this.pipelineResults = data;
+            this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+              observer.next([
+                {
+                  label: "New",
+                  content: this.getQuotes(this.pipelineResults.newQuotes),
+                  tableOptions: this.defaultTableOptions,
+                  quoteTableOptions: this.quoteResultsTableOptions,
+                  quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+                },
+                {
+                  label: "Extension",
+                  content: this.getQuotes(this.pipelineResults.extensionQuotes),
+                  tableOptions: this.defaultTableOptions,
+                  quoteTableOptions: this.quoteResultsExtensionTableOptions,
+                  quoteCount: this.getQuoteCount(
+                    this.pipelineResults.extensionQuotes
+                  ),
+                },
+                {
+                  label: "Awaiting Approval",
+                  content: this.getQuotes(
+                    this.pipelineResults.awaitingApprovalQuotes
+                  ),
+                  tableOptions: this.approvalTableOptions,
+                  quoteTableOptions: this.quoteResultsApprovalTableOptions,
+                  quoteCount: this.getQuoteCount(
+                    this.pipelineResults.awaitingApprovalQuotes
+                  ),
+                },
+              ]);
+              this.lastUpdated = new Date();
+            });
+            this.overviewTabularDataNew = this.setUpLists(
+              this.pipelineResults.pipelineStatistics.newQuotes
+            );
+            this.overviewTabularDataExtension = this.setUpLists(
+              this.pipelineResults.pipelineStatistics.extensionQuotes
+            );
+            this.overviewTabularDataApproval = this.setUpLists(
+              this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+            );
+          });
+   }
 
   // ApprovalHold
   onApprovalHoldClick(row) {
