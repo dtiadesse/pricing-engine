@@ -218,6 +218,35 @@ export class PipelineDetailsComponent implements OnInit {
   }
 
   //------------- Get pipeline Results--------------
+
+  // This will set up our subscription to the getAllComments API to poll for updated comments
+  // //  private openPollingForCommentsStream() {
+  //     this.pollingForComments$ = this.updPollingForComments$.asObservable().pipe(
+  //       switchMap<IConversation[] | null, Observable<IConversation[]>>(
+  //         (updComments: IConversation[] | null) => {
+  //           const contextLineageObj: ConversationContextLineage = {
+  //             opportunityId: this.activeOpportunityId,
+  //             quoteId: this.activeQuoteId,
+  //           };
+
+  //           const pollingInterval = 30000;
+  //           const pollingStream$: Observable<IConversation[]> = pollingRequest(
+  //             this.commentsService.getAllComments(contextLineageObj),
+  //             pollingInterval
+  //           );
+  //           const delayedStream$ = timer(pollingInterval).pipe(
+  //             concatMapTo(pollingStream$)
+  //           );
+  //           return !!updComments
+  //             ? concat(of(updComments), delayedStream$)
+  //             : pollingStream$;
+  //         }
+  //       )
+  //     );
+
+  //     this.updPollingForComments$.next(null);
+  //  }
+
   getPipelineResults() {
     this.pipelineService
       .getPipelineResults()
