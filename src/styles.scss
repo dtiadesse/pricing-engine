@@ -1,4 +1,3 @@
-
 @import './utilities';
 
 // ------------------------------ Base Styles ------------------------------
@@ -8,7 +7,6 @@ body {
   width: 100vw;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 body {
@@ -69,11 +67,12 @@ button.mat-button-base {
       color: $secondary;
 
       // TODO: Ask for the "pin" icon to be fixed
-      .mat-icon:not(.mat-icon-inline):not([disabled]) > svg {
-        g > circle {
+      .mat-icon:not(.mat-icon-inline):not([disabled])>svg {
+        g>circle {
           fill: none !important;
         }
-        g > path {
+
+        g>path {
           fill: $secondary !important;
         }
       }
@@ -189,7 +188,7 @@ mat-drawer-container.mf-drawer-container.override-inner-overflow {
     fill: inherit !important;
 
     // TODO: Ask for the "pin" icon to be fixed
-    g[id='Shape-2'] > path {
+    g[id='Shape-2']>path {
       fill: $lightest !important;
     }
   }
@@ -227,6 +226,7 @@ mat-drawer-container.mf-drawer-container.override-inner-overflow {
 
 mat-form-field.mf-form-field {
   &.mat-form-field-appearance-outline {
+
     // set the default padding defined under One Roof
     &:not(.mf-remove-pb) .mat-form-field-wrapper {
       padding-bottom: 24px;
@@ -424,6 +424,7 @@ mat-radio-group.mf-radio-group {
 
 .mat-select-panel.mf-form-field-select-panel,
 .mat-autocomplete-panel.mf-form-field-autocomplete-panel {
+
   // this will avoid seeing the panel jump while animating
   &.ng-animating {
     visibility: hidden;
@@ -554,7 +555,7 @@ mat-radio-group.mf-radio-group {
   .mat-menu-content {
     padding: 16px;
 
-    > div {
+    >div {
       display: flex;
       flex-direction: column;
     }
@@ -566,6 +567,7 @@ mat-radio-group.mf-radio-group {
       display: flex;
       height: auto;
       padding: 0;
+
       &:not(:first-child) {
         padding-top: 16px;
       }
@@ -584,6 +586,7 @@ mat-radio-group.mf-radio-group {
 // ------------------------------ Side Nav List ------------------------------
 
 .mf-nav-list {
+
   // parent routes should recieve the normal font styles
   .mat-expansion-panel-header-title {
     .mat-list-item .mat-list-item-content {
@@ -633,10 +636,12 @@ mat-radio-group.mf-radio-group {
 
 .mf-condensed-rows,
 .mf-highly-condensed-rows {
-  .mat-header-cell > *,
-  .mat-cell > * {
+
+  .mat-header-cell>*,
+  .mat-cell>* {
     @include mat-typography-level-to-styles($custom-typography, caption);
   }
+
   .mat-cell {
     .mf-navigation-link {
       font-weight: 700 !important;
@@ -662,16 +667,19 @@ mat-radio-group.mf-radio-group {
   .mat-tab-links {
     padding: 0 8px;
   }
+
   .mat-tab-label,
   .mat-tab-link {
     opacity: 1;
     min-width: unset;
     padding: 0;
     margin: 0 24px;
+
     &:hover {
       text-decoration: none;
     }
   }
+
   .mat-ink-bar {
     height: 6px;
   }
@@ -688,12 +696,12 @@ mat-radio-group.mf-radio-group {
 
 // ------------------------------------------------------------
 
-.mf-list-item-leading-icon ~ .mf.body-large,
+.mf-list-item-leading-icon~.mf.body-large,
 .mf-banner-container.mf.body-large {
   line-height: 1.25rem !important;
 }
 
-.mf-list-item-leading-icon ~ .mf.body-medium,
+.mf-list-item-leading-icon~.mf.body-medium,
 .mf-banner-container.mf.body-medium {
   line-height: 1rem !important;
 }
@@ -873,9 +881,11 @@ mat-progress-bar.one-roof .mat-progress-bar-fill::after {
   .ag-cell.ag-cell-inline-editing {
     height: 36px;
   }
+
   .ag-cell {
     line-height: 36px;
   }
+
   .ag-header-cell::after,
   .ag-header-group-cell::after {
     height: 24px;

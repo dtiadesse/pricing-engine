@@ -1,4 +1,6 @@
-export const DEFAULT_PIPELINE_COLUMN_METADATA: any[] = [
+import { DataComponent } from "../../model/data-component";
+
+export const DEFAULT_PIPELINE_COLUMN_METADATA: DataComponent[] = [
   {
     activeInd: true,
     dataMappingName: "opportunityId",
@@ -141,7 +143,7 @@ export const DEFAULT_PIPELINE_COLUMN_METADATA: any[] = [
   },
 ];
 
-export const AwaitingApprovalData: any[] = [
+export const AwaitingApprovalData: DataComponent[] = [
   {
     activeInd: true,
     dataMappingName: "opportunityId",
@@ -300,7 +302,7 @@ export const AwaitingApprovalData: any[] = [
   },
 ];
 
-export const QUOTE_RESULTS_COLUMN_METADATA: any[] = [
+export const QUOTE_RESULTS_COLUMN_METADATA: DataComponent[] = [
   {
     activeInd: true,
     componentType: "quoteResults",
@@ -463,7 +465,7 @@ export const QUOTE_RESULTS_COLUMN_METADATA: any[] = [
   },
 ];
 
-export const QUOTE_RESULTS_EXTENSION_COLUMN_METADATA: any[] = [
+export const QUOTE_RESULTS_EXTENSION_COLUMN_METADATA: DataComponent[] = [
   {
     activeInd: true,
     componentType: "quoteResults",
@@ -642,7 +644,7 @@ export const QUOTE_RESULTS_EXTENSION_COLUMN_METADATA: any[] = [
   },
 ];
 
-export const QUOTE_RESULTS_APPROVAL_COLUMN_METADATA: any[] = [
+export const QUOTE_RESULTS_APPROVAL_COLUMN_METADATA: DataComponent[] = [
   {
     activeInd: true,
     componentType: "quoteResults",
@@ -818,5 +820,104 @@ export const QUOTE_RESULTS_APPROVAL_COLUMN_METADATA: any[] = [
     filterListOptionInd: false,
     sectionName: "",
     sortableInd: true,
+  },
+];
+
+export const OVERVIEW_METADATA: DataComponent[] = [
+  {
+    activeInd: true,
+    dataMappingName: "unclaimedQuotes",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Unclaimed Quotes",
+    displayOrderNumber: 0,
+    name: "Unclaimed Quotes",
+    sectionName: "new",
+    shortName: "Unclaimed Qoutes",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "unapprovedQuotes",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Unapproved Quotes",
+    displayOrderNumber: 1,
+    name: "Unapproved Quotes",
+    sectionName: "new",
+    shortName: "Unapproved Quotes",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "highPriorityQuotes",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Priority Quotes",
+    displayOrderNumber: 2,
+    name: "Priority Quotes",
+    sectionName: "new",
+    shortName: "highPriorityQuotes",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "highPriorityOpportunities",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is  Priority Opportunities",
+    displayOrderNumber: 3,
+    name: "Priority Opportunities",
+    sectionName: "new",
+    shortName: "High Priority Opportunities",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "quotesGreaterThanFiftyMillion",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Quotes Greater Than FiftyMillion",
+    displayOrderNumber: 4,
+    name: "Quotes >50M",
+    sectionName: "new",
+    shortName: "Quote >50",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "opportunitiesGreaterThanFiftyMillion",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Opportunities Greater Than Fifty Million",
+    displayOrderNumber: 5,
+    name: "Opportunities >50M",
+    sectionName: "new",
+    shortName: "Opportunities >50",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "opportunitiesCount",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Opportunities Count",
+    displayOrderNumber: 6,
+    name: "Opportunities",
+    sectionName: "new",
+    shortName: "Opportunities",
+    value: "",
+  },
+  {
+    activeInd: true,
+    dataMappingName: "quotesCount",
+    dataValueEditableInd: false,
+    dataValueType: "string",
+    description: "This is the Quotes count",
+    displayOrderNumber: 7,
+    name: "Quotes",
+    sectionName: "new",
+    shortName: "Quotes",
+    value: "",
   },
 ];

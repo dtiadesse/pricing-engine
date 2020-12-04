@@ -1,23 +1,55 @@
+<ng-container *ngIf="overviewTabularDataNew.length > 0">
+    <div class="row mx-0 mb-4">
+        <div class="col-12">
+            <shared-card [id]="'overViewCard'" [title]="'Overview'" [showContent]="overviewTabularDataNew.length > 0"
+                [isExpandable]="'true'">
+                <ng-container mf-card-content>
+                    <div class="row">
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">NEW</span>
+                            <mf-pe-tabular-list [id]="'overviewNewList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataNew">
+                            </mf-pe-tabular-list>
+                        </div>
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">EXTENSION</span>
+                            <mf-pe-tabular-list [id]="'overviewExtensionList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataExtension">
+                            </mf-pe-tabular-list>
+                        </div>
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">AWAITING APPROVAL</span>
+                            <mf-pe-tabular-list [id]="'overviewApprovalList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataApproval">
+                            </mf-pe-tabular-list>
+                        </div>
+                    </div>
+                </ng-container>
+            </shared-card>
+        </div>
+    </div>
+</ng-container>
+
 <ng-container *ngIf="(asyncTabs | async) !== null">
     <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
         <ng-container mf-card-title-group-action>
-            <div class="row mx-0 mt-2">
-
-                <mat-checkbox id="showMyQuotesChkbox" name="showMyQuotesChkbox" color="primary" disableRipple="true"
-                    (change)="onShowMyQuoteChange($event)" [checked]="showMyQuotes">Show my quotes</mat-checkbox>
-
-                <mat-checkbox id="expandAllChkbox" name="expandAllChkbox" color="primary" disableRipple="true"
-                    (change)="onExpandAllChkboxChange($event)" [checked]="expandAll">Expand all rows</mat-checkbox>
-
-                <div class="mx-1"> <button mat-icon-button color="primary" id="refreshBtn"
-                        (click)="getPipelineResults()">
+            <div class="d-flex align-items-center">
+                <mat-checkbox id="showMyQuotesChkbox" class="mr-4 mf-remove-mb" name="showMyQuotesChkbox"
+                    color="primary" disableRipple="true" (change)="onShowMyQuoteChange($event)">Show my quotes
+                </mat-checkbox>
+                <mat-checkbox id="expandAllChkbox" class="mr-3 mf-remove-mb" name="expandAllChkbox" color="primary"
+                    disableRipple="true" (change)="onExpandAllChkboxChange($event)" [checked]="allRowsExpanded">Expand
+                    all rows
+                </mat-checkbox>
+                <div class="d-flex align-items-center">
+                    <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
                         <mat-icon class="material-icons-outlined">refresh</mat-icon>
                     </button>
-                    <span class="pt-1" id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
+                    <span id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
                 </div>
-
             </div>
         </ng-container>
+
         <ng-container mf-card-content>
             <div class="row mx-0 ">
                 <div class="col px-0">
@@ -30,7 +62,7 @@
                                 <div class="mt-4" *ngIf="tab.content?.length">
                                     <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
                                         [tableData]="tab.content" [expandAllRows]="allRowsExpanded"
-                                        expandedRow="expandedRow" [tableOptions]="tab.tableOptions">
+                                        [tableOptions]="tab.tableOptions">
                                         <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
                                             <ng-container *ngIf="
                                 column.key === 'submitDateTime' ||
@@ -54,9 +86,9 @@
                                                             <mat-icon *ngIf="row.quoteResults.length > 0"
                                                                 [id]="'pipelineResultsTableRow-' + row.opportunityId"
                                                                 class="mf-expansion-indicator mx-2"
-                                                                (click)="toogleOnRotate(index, row)"
+                                                                (click)="toggleContent(row)"
                                                                 [@expansionIndicatorRotate]="
-                                        row.expanded
+                                  row == pipelineResultsTable.expandedRow || allRowsExpanded
                                           ? 'expanded'
                                           : 'collapsed'
                                       "> expand_more</mat-icon>
@@ -85,7 +117,7 @@
                                                                             {{row.claimedByUserId !== currentUserId ? 'Claim' : 'Unclaim'}}
                                                                         </button>
                                                                         <button
-                                                                            *ngIf="tab.index == 2 && quotes.approvalLimit > row.maxUPB"
+                                                                            *ngIf="(tab.label == 'Awaiting Approval') && pipelineResults.approvalLimit > row.maxUPB"
                                                                             mat-menu-item
                                                                             class="mf-contextual-menu-item"
                                                                             (click)="onApprovalHoldClick(row)">
@@ -112,7 +144,8 @@
                                             </ng-template>
                                         </ng-template>
                                         <ng-template #masterDetailTemplate let-row="row" let-index="index">
-                                            <ng-container *ngIf="pipelineResultsTable.expandedRow !== null">
+                                            <ng-container
+                                                *ngIf="(pipelineResultsTable.expandedRow !== null )|| allRowsExpanded ">
                                                 <mf-pe-table [id]="'quoteResultsTable-'+ index"
                                                     [tableData]="row.expandedMasterDetail"
                                                     [tableOptions]="tab.quoteTableOptions">
