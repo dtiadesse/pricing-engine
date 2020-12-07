@@ -86,6 +86,7 @@ export class PipelineDetailsComponent implements OnInit {
   pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   allRowsExpanded = false;
+  expandedData: any | {};
 
   overviewTabularDataNew: TabularListItem[] = [];
   overviewTabularDataExtension: TabularListItem[] = [];
@@ -97,7 +98,6 @@ export class PipelineDetailsComponent implements OnInit {
     PipelineResults[] | null
   > = new BehaviorSubject<PipelineResults[] | null>(null);
 
-
   // ------------------------------ Init ------------------------------
   constructor(
     private pipelineService: PipelineManagementService,
@@ -106,6 +106,7 @@ export class PipelineDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.expandedData = {};
     if (this.pipelineService.userId) {
       this.currentUserId = `${this.pipelineService.userId}`;
     }
@@ -131,6 +132,8 @@ export class PipelineDetailsComponent implements OnInit {
     this.quoteResultsApprovalTableOptions = _.cloneDeep(
       this.getTableOptions(this.quoteResultsApprovalColMeta, true)
     );
+
+    this.getPipelineResults();
 
     this.openPollingForRefresh();
   }
@@ -159,6 +162,7 @@ export class PipelineDetailsComponent implements OnInit {
       );
       this.pipelineResultsTableRef.expandedRow =
         expandedRowOpportunityId === row.opportunityId ? null : row;
+      this.expandedData.opportunityId = expandedRowOpportunityId == row.opportunityId ? null : row.opportunityId;
     }
   }
 
