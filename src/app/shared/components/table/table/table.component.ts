@@ -66,6 +66,9 @@ export class TableComponent implements OnInit, AfterViewInit {
   masterDetailTemplateRef: TemplateRef<any>;
   expandedRow: any | null;
 
+  @Input()
+  opportunityId: any | null;
+
   private _tableOptions: TableOptions = _.clone(DEFAULT_TABLE_OPTIONS);
   @Input()
   set tableOptions(options: TableOptions) {

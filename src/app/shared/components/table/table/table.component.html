@@ -131,7 +131,7 @@
             <td mat-cell *matCellDef="let row; let i = dataIndex;" [attr.colspan]="displayedColumns.length">
                 <div *ngIf="!!row.expandedMasterDetail && masterDetailTemplateRef"
                     class="mf-master-detail-row-container"
-                    [@expansionHeight]="(row == expandedRow || expandAllRows) ? 'expanded' : 'collapsed'">
+                    [@expansionHeight]="(row == expandedRow || row.opportunityId == opportunityId.opportunityId || expandAllRows) ? 'expanded' : 'collapsed'">
                     <div class="mf-master-detail-row-contents">
                         <ng-container *ngTemplateOutlet="masterDetailTemplateRef; context: { row: row, index: i }">
                         </ng-container>
