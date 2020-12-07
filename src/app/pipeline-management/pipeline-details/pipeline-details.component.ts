@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { Observable, Observer, BehaviorSubject, concat, of, timer } from "rxjs";
 import { concatMapTo, switchMap } from "rxjs/operators";
 import * as _ from "lodash";
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 // Material
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
@@ -104,7 +103,6 @@ export class PipelineDetailsComponent implements OnInit {
     private pipelineService: PipelineManagementService,
     // private notification: SnackbarService,
     public dialog: MatDialog,
-    private http: HttpClient
   ) {}
 
   ngOnInit() {
