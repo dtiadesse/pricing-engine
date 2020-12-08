@@ -228,55 +228,60 @@ export class PipelineDetailsComponent implements OnInit {
   }
 
   getPipelineResults() {
-      this.pipelineService
-        .getPipelineResults()
-        .subscribe((data: PipelineResults) => {
-          this.pipelineResults = data;
-          this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
-            observer.next([
-              {
-                label: "New",
-                content: this.getQuotes(this.pipelineResults.newQuotes),
-                tableOptions: this.defaultTableOptions,
-                quoteTableOptions: this.quoteResultsTableOptions,
-                quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
-              },
-              {
-                label: "Extension",
-                content: this.getQuotes(this.pipelineResults.extensionQuotes),
-                tableOptions: this.defaultTableOptions,
-                quoteTableOptions: this.quoteResultsExtensionTableOptions,
-                quoteCount: this.getQuoteCount(
-                  this.pipelineResults.extensionQuotes
-                ),
-              },
-              {
-                label: "Awaiting Approval",
-                content: this.getQuotes(
-                  this.pipelineResults.awaitingApprovalQuotes
-                ),
-                tableOptions: this.approvalTableOptions,
-                quoteTableOptions: this.quoteResultsApprovalTableOptions,
-                quoteCount: this.getQuoteCount(
-                  this.pipelineResults.awaitingApprovalQuotes
-                ),
-              },
-            ]);
-            this.lastUpdated = new Date();
-          });
-          this.overviewTabularDataNew = this.setUpLists(
-            this.pipelineResults.pipelineStatistics.newQuotes
-          );
-          this.overviewTabularDataExtension = this.setUpLists(
-            this.pipelineResults.pipelineStatistics.extensionQuotes
-          );
-          this.overviewTabularDataApproval = this.setUpLists(
-            this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
-          );
-        });
-        return this.pipelineService
-        .getPipelineResults();
+    this.pipelineService
+      .getPipelineResults()
+      .subscribe((data: PipelineResults) => {
+        this.loadPipelineResults(data);
+      });
+      return this.pipelineService
+      .getPipelineResults();
     }
+
+
+  loadPipelineResults(data: PipelineResults) {
+    this.pipelineResults = data;
+    this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+      observer.next([
+        {
+          label: "New",
+          content: this.getQuotes(this.pipelineResults.newQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+        },
+        {
+          label: "Extension",
+          content: this.getQuotes(this.pipelineResults.extensionQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.extensionQuotes
+          ),
+        },
+        {
+          label: "Awaiting Approval",
+          content: this.getQuotes(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+          tableOptions: this.approvalTableOptions,
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+        },
+      ]);
+      this.lastUpdated = new Date();
+    });
+    this.overviewTabularDataNew = this.setUpLists(
+      this.pipelineResults.pipelineStatistics.newQuotes
+    );
+    this.overviewTabularDataExtension = this.setUpLists(
+      this.pipelineResults.pipelineStatistics.extensionQuotes
+    );
+    this.overviewTabularDataApproval = this.setUpLists(
+      this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+    );
+  }
 
   //------------- Get pipeline Results--------------
 
@@ -290,49 +295,8 @@ export class PipelineDetailsComponent implements OnInit {
     timer(1, pollingInterval).pipe(
       concatMapTo(pollingStream$)
     ).subscribe((data: PipelineResults) => {
-            this.pipelineResults = data;
-            this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
-              observer.next([
-                {
-                  label: "New",
-                  content: this.getQuotes(this.pipelineResults.newQuotes),
-                  tableOptions: this.defaultTableOptions,
-                  quoteTableOptions: this.quoteResultsTableOptions,
-                  quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
-                },
-                {
-                  label: "Extension",
-                  content: this.getQuotes(this.pipelineResults.extensionQuotes),
-                  tableOptions: this.defaultTableOptions,
-                  quoteTableOptions: this.quoteResultsExtensionTableOptions,
-                  quoteCount: this.getQuoteCount(
-                    this.pipelineResults.extensionQuotes
-                  ),
-                },
-                {
-                  label: "Awaiting Approval",
-                  content: this.getQuotes(
-                    this.pipelineResults.awaitingApprovalQuotes
-                  ),
-                  tableOptions: this.approvalTableOptions,
-                  quoteTableOptions: this.quoteResultsApprovalTableOptions,
-                  quoteCount: this.getQuoteCount(
-                    this.pipelineResults.awaitingApprovalQuotes
-                  ),
-                },
-              ]);
-              this.lastUpdated = new Date();
-            });
-            this.overviewTabularDataNew = this.setUpLists(
-              this.pipelineResults.pipelineStatistics.newQuotes
-            );
-            this.overviewTabularDataExtension = this.setUpLists(
-              this.pipelineResults.pipelineStatistics.extensionQuotes
-            );
-            this.overviewTabularDataApproval = this.setUpLists(
-              this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
-            );
-          });
+        this.loadPipelineResults(data);
+      });
    }
 
   // ApprovalHold
