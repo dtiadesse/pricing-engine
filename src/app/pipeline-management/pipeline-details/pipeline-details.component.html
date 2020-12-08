@@ -66,7 +66,7 @@
                                                 [tableData]="tab.content" [expandAllRows]="allRowsExpanded"
                                                 [tableOptions]="tab.tableOptions"
                                                 [expandedRow]="pipelineResultsTableRef"
-                                                [opportunityId]="expandedData"
+                                                [expandedIndex]="expandedData"
                                                 >
                                                 <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
                                                     <ng-container *ngIf="
@@ -91,9 +91,9 @@
                                                                     <mat-icon *ngIf="row.quoteResults.length > 0"
                                                                         [id]="'pipelineResultsTableRow-' + row.opportunityId"
                                                                         class="mf-expansion-indicator mx-2"
-                                                                        (click)="toggleContent(row)"
+                                                                        (click)="toggleContent(row, index)"
                                                                         [@expansionIndicatorRotate]="
-                                        row == pipelineResultsTable.expandedRow || row.opportunityId == expandedData.opportunityId ||  allRowsExpanded
+                                        row == pipelineResultsTable.expandedRow || index == expandedData.expandedIndex ||  allRowsExpanded
                                                 ? 'expanded'
                                                 : 'collapsed'
                                             "> expand_more</mat-icon>
@@ -154,7 +154,7 @@
                                                         <mf-pe-table [id]="'quoteResultsTable-'+ index"
                                                             [tableData]="row.expandedMasterDetail"
                                                             [tableOptions]="tab.quoteTableOptions"
-                                                            [opportunityId]="expandedData"
+                                                            [expandedIndex]="expandedData"
                                                             pipelineResultsTableRef="pipelineResultsTableRef"
                                                             >
                                                             <ng-template #cellTemplate let-row="row" let-column="column"

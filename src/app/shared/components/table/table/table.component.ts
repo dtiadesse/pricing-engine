@@ -67,7 +67,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   expandedRow: any | null;
 
   @Input()
-  opportunityId: any | null;
+  expandedIndex: any | null;
 
   private _tableOptions: TableOptions = _.clone(DEFAULT_TABLE_OPTIONS);
   @Input()

@@ -150,8 +150,9 @@ export class PipelineDetailsComponent implements OnInit {
   onExpandAllChkboxChange(ev: MatCheckboxChange) {
     this.allRowsExpanded = ev.checked;
     this.pipelineResultsTableRef.expandedRow = null;
+    this.expandedData.expandedIndex = null;
   }
-  toggleContent(row) {
+  toggleContent(row, index) {
     if (this.allRowsExpanded) {
       this.allRowsExpanded = false;
     } else {
@@ -162,7 +163,8 @@ export class PipelineDetailsComponent implements OnInit {
       );
       this.pipelineResultsTableRef.expandedRow =
         expandedRowOpportunityId === row.opportunityId ? null : row;
-      this.expandedData.opportunityId = expandedRowOpportunityId == row.opportunityId ? null : row.opportunityId;
+        console.log("this.pipelineResultsTableRef", this.pipelineResultsTableRef)
+      this.expandedData.expandedIndex = expandedRowOpportunityId === row.opportunityId ? null : index;
     }
   }
 
