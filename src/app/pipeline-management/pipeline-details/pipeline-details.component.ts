@@ -93,10 +93,10 @@ export class PipelineDetailsComponent implements OnInit {
 
   overviewTabularDataApproval: TabularListItem[] = [];
   overviewMetadata: DataComponent[] = _.clone(OVERVIEW_METADATA);
-  pollingForRefresh$: Observable<PipelineResults[]>;
+  pollingForRefresh$: Observable<PipelineResults>;
   updPollingForRefresh$: BehaviorSubject<
-    PipelineResults[] | null
-  > = new BehaviorSubject<PipelineResults[] | null>(null);
+    PipelineResults | null
+  > = new BehaviorSubject<PipelineResults | null>(null);
 
   // ------------------------------ Init ------------------------------
   constructor(
@@ -132,9 +132,6 @@ export class PipelineDetailsComponent implements OnInit {
     this.quoteResultsApprovalTableOptions = _.cloneDeep(
       this.getTableOptions(this.quoteResultsApprovalColMeta, true)
     );
-
-    this.getPipelineResults();
-
     this.openPollingForRefresh();
   }
 
@@ -289,16 +286,68 @@ export class PipelineDetailsComponent implements OnInit {
 
   // This will set up our subscription to the getPipelineResults API to poll for updated data
    private openPollingForRefresh() {
-    const pollingInterval = 3000;
-    const pollingStream$ = pollingRequest(
-      this.pipelineService.getPipelineResults(),
-      pollingInterval
-    );
-    timer(1, pollingInterval).pipe(
-      concatMapTo(pollingStream$)
-    ).subscribe((data: PipelineResults) => {
-        this.loadPipelineResults(data);
-      });
+    this.pollingForRefresh$ = this.updPollingForRefresh$.asObservable().pipe(
+      switchMap<PipelineResults | null, Observable<PipelineResults>>(
+        (data: PipelineResults | null) => {
+          const pollingInterval = 30000;
+          const pollingStream$: Observable<PipelineResults> = pollingRequest(
+            this.pipelineService.getPipelineResults(),
+            pollingInterval
+          );
+          const delayedStream$ = timer(1, pollingInterval).pipe(
+            concatMapTo(pollingStream$)
+          );
+          return !!data
+            ? concat(of(data), delayedStream$)
+            : pollingStream$;
+        }
+      )
+    )
+    this.pollingForRefresh$.subscribe((data: PipelineResults) => {
+      this.pipelineResults = data;
+      this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+      observer.next([
+        {
+          label: "New",
+          content: this.getQuotes(this.pipelineResults.newQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+        },
+        {
+          label: "Extension",
+          content: this.getQuotes(this.pipelineResults.extensionQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.extensionQuotes
+          ),
+        },
+        {
+          label: "Awaiting Approval",
+          content: this.getQuotes(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+          tableOptions: this.approvalTableOptions,
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+        },
+      ]);
+      this.lastUpdated = new Date();
+      this.overviewTabularDataNew = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.newQuotes
+      );
+      this.overviewTabularDataExtension = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.extensionQuotes
+      );
+      this.overviewTabularDataApproval = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+      );
+    })})
+    
+    this.updPollingForRefresh$.next(null)
    }
 
   // ApprovalHold
