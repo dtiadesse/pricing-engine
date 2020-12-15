@@ -32,6 +32,8 @@ export class TabularListComponent1 {
   }
   groupedData: TabularListItem[][] = [];
 
+  rowIcon: String = "info";
+
   // ------------------------------ Init ------------------------------
 
   constructor() { }
