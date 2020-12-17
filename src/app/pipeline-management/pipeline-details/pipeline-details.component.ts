@@ -87,6 +87,7 @@ export class PipelineDetailsComponent implements OnInit {
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   allRowsExpanded = false;
   expandedData: any | {};
+  isShowQuotesChecked: Boolean = false;
 
   overviewTabularDataNew: TabularListItem[] = [];
   overviewTabularDataExtension: TabularListItem[] = [];
@@ -141,7 +142,7 @@ export class PipelineDetailsComponent implements OnInit {
       item.expandedMasterDetail = _.get(item, "quoteResults", []);
       return item;
     });
-    return quoteResults;
+    return !this.isShowQuotesChecked ? quoteResults : [];
   }
 
   onExpandAllChkboxChange(ev: MatCheckboxChange) {
@@ -175,6 +176,7 @@ export class PipelineDetailsComponent implements OnInit {
     };
     const userId = this.pipelineService.userId;
     if (ev.checked) {
+      this.isShowQuotesChecked = true;
       filterQuotes.newQuotes = this.pipelineResults.newQuotes.filter(
         (x: any) => x.claimedByUserId === userId
       );
@@ -185,6 +187,7 @@ export class PipelineDetailsComponent implements OnInit {
         (x: any) => x.claimedByUserId === userId
       );
     } else {
+      this.isShowQuotesChecked = false;
       filterQuotes = this.pipelineResults;
     }
 
@@ -223,7 +226,7 @@ export class PipelineDetailsComponent implements OnInit {
         count = count + item.quoteResults.length;
       });
     }
-    return count;
+    return !this.isShowQuotesChecked ? count : 0;
   }
 
   getPipelineResults() {
