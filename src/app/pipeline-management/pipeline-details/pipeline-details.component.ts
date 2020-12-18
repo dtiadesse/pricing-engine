@@ -87,7 +87,6 @@ export class PipelineDetailsComponent implements OnInit {
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
   allRowsExpanded = false;
   expandedData: any | {};
-  isShowQuotesChecked: Boolean = false;
 
   overviewTabularDataNew: TabularListItem[] = [];
   overviewTabularDataExtension: TabularListItem[] = [];
@@ -99,6 +98,7 @@ export class PipelineDetailsComponent implements OnInit {
     PipelineResults | null
   > = new BehaviorSubject<PipelineResults | null>(null);
 
+  showFilteredQuotes: Boolean = false;
   // ------------------------------ Init ------------------------------
   constructor(
     private pipelineService: PipelineManagementService,
@@ -138,11 +138,16 @@ export class PipelineDetailsComponent implements OnInit {
 
   // ------------------------------ Table ------------------------------
   getQuotes(data) {
-    const quoteResults = _.map(data, (item: any) => {
+    let quoteResults = _.map(data, (item: any) => {
       item.expandedMasterDetail = _.get(item, "quoteResults", []);
       return item;
     });
-    return !this.isShowQuotesChecked ? quoteResults : [];
+    if (this.showFilteredQuotes) {
+      quoteResults = quoteResults.filter(item => {
+        return item.claimedByUserId === this.pipelineService.userId
+      })
+    }
+    return quoteResults;
   }
 
   onExpandAllChkboxChange(ev: MatCheckboxChange) {
@@ -167,52 +172,34 @@ export class PipelineDetailsComponent implements OnInit {
   }
 
   onShowMyQuoteChange(ev: MatCheckboxChange) {
-    let filterQuotes: PipelineResults = {
-      newQuotes: [],
-      extensionQuotes: [],
-      awaitingApprovalQuotes: [],
-      approvalLimit: this.pipelineResults.approvalLimit,
-      userId: this.currentUserId,
-    };
-    const userId = this.pipelineService.userId;
     if (ev.checked) {
-      this.isShowQuotesChecked = true;
-      filterQuotes.newQuotes = this.pipelineResults.newQuotes.filter(
-        (x: any) => x.claimedByUserId === userId
-      );
-      filterQuotes.extensionQuotes = this.pipelineResults.extensionQuotes.filter(
-        (x: any) => x.claimedByUserId === userId
-      );
-      filterQuotes.awaitingApprovalQuotes = this.pipelineResults.awaitingApprovalQuotes.filter(
-        (x: any) => x.claimedByUserId === userId
-      );
+      this.showFilteredQuotes = true;
     } else {
-      this.isShowQuotesChecked = false;
-      filterQuotes = this.pipelineResults;
+      this.showFilteredQuotes = false;
     }
 
     this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
       observer.next([
         {
           label: "New",
-          content: this.getQuotes(filterQuotes.newQuotes),
+          content: this.getQuotes(this.pipelineResults.newQuotes),
           tableOptions: this.defaultTableOptions,
           quoteTableOptions: this.quoteResultsTableOptions,
-          quoteCount: this.getQuoteCount(filterQuotes.newQuotes),
+          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
         },
         {
           label: "Extension",
-          content: this.getQuotes(filterQuotes.extensionQuotes),
+          content: this.getQuotes(this.pipelineResults.extensionQuotes),
           tableOptions: this.defaultTableOptions,
           quoteTableOptions: this.quoteResultsExtensionTableOptions,
-          quoteCount: this.getQuoteCount(filterQuotes.extensionQuotes),
+          quoteCount: this.getQuoteCount(this.pipelineResults.extensionQuotes),
         },
         {
           label: "Awaiting Approval",
-          content: this.getQuotes(filterQuotes.awaitingApprovalQuotes),
+          content: this.getQuotes(this.pipelineResults.awaitingApprovalQuotes),
           tableOptions: this.approvalTableOptions,
           quoteTableOptions: this.quoteResultsApprovalTableOptions,
-          quoteCount: this.getQuoteCount(filterQuotes.awaitingApprovalQuotes),
+          quoteCount: this.getQuoteCount(this.pipelineResults.awaitingApprovalQuotes),
         },
       ]);
     });
@@ -226,7 +213,7 @@ export class PipelineDetailsComponent implements OnInit {
         count = count + item.quoteResults.length;
       });
     }
-    return !this.isShowQuotesChecked ? count : 0;
+    return count;
   }
 
   getPipelineResults() {
@@ -273,16 +260,16 @@ export class PipelineDetailsComponent implements OnInit {
         },
       ]);
       this.lastUpdated = new Date();
-    });
-    this.overviewTabularDataNew = this.setUpLists(
-      this.pipelineResults.pipelineStatistics.newQuotes
-    );
-    this.overviewTabularDataExtension = this.setUpLists(
-      this.pipelineResults.pipelineStatistics.extensionQuotes
-    );
-    this.overviewTabularDataApproval = this.setUpLists(
-      this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
-    );
+      this.overviewTabularDataNew = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.newQuotes
+      );
+      this.overviewTabularDataExtension = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.extensionQuotes
+      );
+      this.overviewTabularDataApproval = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+      );
+    })
   }
 
   //------------- Get pipeline Results--------------
@@ -307,48 +294,8 @@ export class PipelineDetailsComponent implements OnInit {
       )
     )
     this.pollingForRefresh$.subscribe((data: PipelineResults) => {
-      this.pipelineResults = data;
-      this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
-      observer.next([
-        {
-          label: "New",
-          content: this.getQuotes(this.pipelineResults.newQuotes),
-          tableOptions: this.defaultTableOptions,
-          quoteTableOptions: this.quoteResultsTableOptions,
-          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
-        },
-        {
-          label: "Extension",
-          content: this.getQuotes(this.pipelineResults.extensionQuotes),
-          tableOptions: this.defaultTableOptions,
-          quoteTableOptions: this.quoteResultsExtensionTableOptions,
-          quoteCount: this.getQuoteCount(
-            this.pipelineResults.extensionQuotes
-          ),
-        },
-        {
-          label: "Awaiting Approval",
-          content: this.getQuotes(
-            this.pipelineResults.awaitingApprovalQuotes
-          ),
-          tableOptions: this.approvalTableOptions,
-          quoteTableOptions: this.quoteResultsApprovalTableOptions,
-          quoteCount: this.getQuoteCount(
-            this.pipelineResults.awaitingApprovalQuotes
-          ),
-        },
-      ]);
-      this.lastUpdated = new Date();
-      this.overviewTabularDataNew = this.setUpLists(
-        this.pipelineResults.pipelineStatistics.newQuotes
-      );
-      this.overviewTabularDataExtension = this.setUpLists(
-        this.pipelineResults.pipelineStatistics.extensionQuotes
-      );
-      this.overviewTabularDataApproval = this.setUpLists(
-        this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
-      );
-    })})
+      this.loadPipelineResults(data);
+    })
     
     this.updPollingForRefresh$.next(null)
    }

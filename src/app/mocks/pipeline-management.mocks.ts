@@ -37,7 +37,7 @@ export const MOCK_PIPELINE_RESULTS: any = {
     {
       opportunityId: "10006088",
       maxUPB: 15125000,
-      claimedByUserId: null,
+      claimedByUserId: '1234',
       claimedBy: "Russell, Matthew",
       quoteCount: 4,
       submitDateTime: "2020-06-15T23:05:50.000+0000",
