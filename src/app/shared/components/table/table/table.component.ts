@@ -43,8 +43,6 @@ import {
 export class TableComponent implements OnInit, AfterViewInit {
   @Input() id: string;
 
-  @Input() expandAllRows: boolean = false;
-
   dataSource: MatTableDataSource<any>;
   private _tableData: any[] = [];
   @Input()
@@ -56,15 +54,20 @@ export class TableComponent implements OnInit, AfterViewInit {
     return this._tableData;
   }
 
+  // Expand All rows
+  @Input() expandAllRows = false;
+
   // Custom Cells
-  @ContentChild("cellTemplate", { static: false }) cellTemplateRef: TemplateRef<
-    any
-  >;
+  @ContentChild("cellTemplate", { static: false })
+  cellTemplateRef: TemplateRef<any>;
 
   // Expanded Rows
   @ContentChild("masterDetailTemplate", { static: false })
   masterDetailTemplateRef: TemplateRef<any>;
-  public expandedRow: any | null;
+  expandedRow: any | null;
+
+  @Input()
+  expandedIndex: any | null;
 
   private _tableOptions: TableOptions = _.clone(DEFAULT_TABLE_OPTIONS);
   @Input()
@@ -80,9 +83,8 @@ export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [];
 
   // Actions
-  @Output() tableRowAction: EventEmitter<
-    SelectedTableRowActionEvent
-  > = new EventEmitter<SelectedTableRowActionEvent>();
+  @Output()
+  tableRowAction: EventEmitter<SelectedTableRowActionEvent> = new EventEmitter<SelectedTableRowActionEvent>();
 
   // Sort
   @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -131,9 +133,8 @@ export class TableComponent implements OnInit, AfterViewInit {
     return this._defaultSelected;
   }
 
-  @Output() rowSelectionChange: EventEmitter<
-    SelectedTableRowEvent
-  > = new EventEmitter<SelectedTableRowEvent>();
+  @Output()
+  rowSelectionChange: EventEmitter<SelectedTableRowEvent> = new EventEmitter<SelectedTableRowEvent>();
 
   // Paginator
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -144,12 +145,14 @@ export class TableComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.dataSource = new MatTableDataSource(this.tableData);
+
     // init columns
     this.updateColumns();
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+
     // need to add MatSort and MatPaginator when using MatTableDataSource
     this.dataSource.sort = this.sort;
 

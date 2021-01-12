@@ -1,22 +1,19 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { Observable, Observer } from "rxjs";
+import { Observable, Observer, BehaviorSubject, concat, of, timer } from "rxjs";
+import { concatMapTo, switchMap } from "rxjs/operators";
 import * as _ from "lodash";
-
 // Material
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
 // Shared
-// import {
-//   expansionIndicatorRotate,
-//   SnackbarService,
-// } from "@Multifamily/shared/components";
 
 // Services
 import { PipelineManagementService } from "../../services/pipeline-management.service";
+import { pollingRequest } from "src/app/shared/utilities/polling-request";
 
 // Components
 import { StatusDialogComponent } from "../../shared/components/status-modal/status.modal.component";
-// "../../../../shared/components/status-modal/status-modal.component";
+
 import { TableComponent } from "../../shared/components/table/table/table.component";
 
 // Models
@@ -28,18 +25,25 @@ import {
   QUOTE_RESULTS_APPROVAL_COLUMN_METADATA,
   QUOTE_RESULTS_COLUMN_METADATA,
   QUOTE_RESULTS_EXTENSION_COLUMN_METADATA,
+  OVERVIEW_METADATA,
 } from "./pipeline.constant";
+import {
+  PipelineResults,
+  PipelineOpportunityDetails,
+  QuoteStatistics,
+} from "../model/pipeline-results.model";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 import {
   TableOptions,
   TableColumn,
 } from "../../shared/components/table/model/table.model";
 import { expansionIndicatorRotate } from "../../multifamily/shared/components/animate-animation";
 import { StatusModalMeta } from "../../shared/components/status-modal/status-model";
-
+import { DataComponent } from "../../model/data-component";
+import { TabularListItem } from "../../shared/components/tabular-list/models/tabular-list-item-model";
 export interface PipelineTab {
   label?: string;
   content: any[];
-  index?: number;
   tableOptions?: TableOptions;
   quoteTableOptions?: TableOptions;
   quoteCount?: number;
@@ -52,22 +56,21 @@ export interface PipelineTab {
   animations: [expansionIndicatorRotate],
 })
 export class PipelineDetailsComponent implements OnInit {
-  quotes: any = {
+  pipelineResults: PipelineResults = {
     newQuotes: [],
     extensionQuotes: [],
     awaitingApprovalQuotes: [],
-    results: null,
     userId: null,
     approvalLimit: null,
   };
 
-  defaultColMeta: any[] = _.clone(DEFAULT_PIPELINE_COLUMN_METADATA);
-  approvalColMeta: any[] = _.clone(AwaitingApprovalData);
-  quoteResultsColMeta: any[] = _.clone(QUOTE_RESULTS_COLUMN_METADATA);
-  quoteResultsExtensionColMeta: any[] = _.clone(
+  defaultColMeta: DataComponent[] = _.clone(DEFAULT_PIPELINE_COLUMN_METADATA);
+  approvalColMeta: DataComponent[] = _.clone(AwaitingApprovalData);
+  quoteResultsColMeta: DataComponent[] = _.clone(QUOTE_RESULTS_COLUMN_METADATA);
+  quoteResultsExtensionColMeta: DataComponent[] = _.clone(
     QUOTE_RESULTS_EXTENSION_COLUMN_METADATA
   );
-  quoteResultsApprovalColMeta: any[] = _.clone(
+  quoteResultsApprovalColMeta: DataComponent[] = _.clone(
     QUOTE_RESULTS_APPROVAL_COLUMN_METADATA
   );
   quoteResultsExtensionTableOptions: TableOptions;
@@ -79,17 +82,32 @@ export class PipelineDetailsComponent implements OnInit {
   quoteResultsTableOptions: TableOptions;
   approvalTableOptions: TableOptions;
   @ViewChild("tabGroup", { static: false }) tabGroup: any;
+  @ViewChild("pipelineResultsTable", { static: false })
+  pipelineResultsTableRef: TableComponent;
   @ViewChild(TableComponent, { static: false }) tableComponent: TableComponent;
-  errorMessage: string;
-  // ------------------------------ Init ------------------------------
+  allRowsExpanded = false;
+  expandedData: any | {};
 
+  overviewTabularDataNew: TabularListItem[] = [];
+  overviewTabularDataExtension: TabularListItem[] = [];
+
+  overviewTabularDataApproval: TabularListItem[] = [];
+  overviewMetadata: DataComponent[] = _.clone(OVERVIEW_METADATA);
+  pollingForRefresh$: Observable<PipelineResults>;
+  updPollingForRefresh$: BehaviorSubject<
+    PipelineResults | null
+  > = new BehaviorSubject<PipelineResults | null>(null);
+
+  showFilteredQuotes: Boolean = false;
+  // ------------------------------ Init ------------------------------
   constructor(
     private pipelineService: PipelineManagementService,
-    // private notification: any,
-    public dialog: MatDialog
+    // private notification: SnackbarService,
+    public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
+    this.expandedData = {};
     if (this.pipelineService.userId) {
       this.currentUserId = `${this.pipelineService.userId}`;
     }
@@ -115,17 +133,76 @@ export class PipelineDetailsComponent implements OnInit {
     this.quoteResultsApprovalTableOptions = _.cloneDeep(
       this.getTableOptions(this.quoteResultsApprovalColMeta, true)
     );
-
-    this.getPipelineResults();
+    this.openPollingForRefresh();
   }
 
   // ------------------------------ Table ------------------------------
   getQuotes(data) {
-    const quoteResults = _.map(data, (item: any) => {
+    let quoteResults = _.map(data, (item: any) => {
       item.expandedMasterDetail = _.get(item, "quoteResults", []);
       return item;
     });
+    if (this.showFilteredQuotes) {
+      quoteResults = quoteResults.filter(item => {
+        return item.claimedByUserId === this.pipelineService.userId
+      })
+    }
     return quoteResults;
+  }
+
+  onExpandAllChkboxChange(ev: MatCheckboxChange) {
+    this.allRowsExpanded = ev.checked;
+    this.pipelineResultsTableRef.expandedRow = null;
+    this.expandedData.expandedIndex = null;
+  }
+  toggleContent(row, index) {
+    if (this.allRowsExpanded) {
+      this.allRowsExpanded = false;
+    } else {
+      const expandedRowOpportunityId = _.get(
+        this.pipelineResultsTableRef,
+        "expandedRow.opportunityId",
+        null
+      );
+      this.pipelineResultsTableRef.expandedRow =
+        expandedRowOpportunityId === row.opportunityId ? null : row;
+        console.log("this.pipelineResultsTableRef", this.pipelineResultsTableRef)
+      this.expandedData.expandedIndex = expandedRowOpportunityId === row.opportunityId ? null : index;
+    }
+  }
+
+  onShowMyQuoteChange(ev: MatCheckboxChange) {
+    if (ev.checked) {
+      this.showFilteredQuotes = true;
+    } else {
+      this.showFilteredQuotes = false;
+    }
+
+    this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+      observer.next([
+        {
+          label: "New",
+          content: this.getQuotes(this.pipelineResults.newQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+        },
+        {
+          label: "Extension",
+          content: this.getQuotes(this.pipelineResults.extensionQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.extensionQuotes),
+        },
+        {
+          label: "Awaiting Approval",
+          content: this.getQuotes(this.pipelineResults.awaitingApprovalQuotes),
+          tableOptions: this.approvalTableOptions,
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.awaitingApprovalQuotes),
+        },
+      ]);
+    });
   }
 
   //--------------- To get the quote count of the each Opportunity -------------------
@@ -139,47 +216,95 @@ export class PipelineDetailsComponent implements OnInit {
     return count;
   }
 
-  //------------- Get pipeline Results--------------
   getPipelineResults() {
-    this.pipelineService.getPipelineResults().subscribe((data: any) => {
-      this.quotes = data;
-      this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
-        observer.next([
-          {
-            label: "New",
-            content: this.getQuotes(this.quotes.newQuotes),
-            index: 0,
-            tableOptions: this.defaultTableOptions,
-            quoteTableOptions: this.quoteResultsTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.newQuotes),
-          },
-          {
-            label: "Extension",
-            content: this.getQuotes(this.quotes.extensionQuotes),
-            index: 1,
-            tableOptions: this.defaultTableOptions,
-            quoteTableOptions: this.quoteResultsExtensionTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.extensionQuotes),
-          },
-          {
-            label: "Awaiting Approval",
-            content: this.getQuotes(this.quotes.awaitingApprovalQuotes),
-            index: 2,
-            tableOptions: this.approvalTableOptions,
-            quoteTableOptions: this.quoteResultsApprovalTableOptions,
-            quoteCount: this.getQuoteCount(this.quotes.awaitingApprovalQuotes),
-          },
-        ]);
-        this.lastUpdated = new Date();
+    this.pipelineService
+      .getPipelineResults()
+      .subscribe((data: PipelineResults) => {
+        this.loadPipelineResults(data);
       });
-    });
+      return this.pipelineService
+      .getPipelineResults();
+    }
+
+
+  loadPipelineResults(data: PipelineResults) {
+    this.pipelineResults = data;
+    this.asyncTabs = new Observable((observer: Observer<PipelineTab[]>) => {
+      observer.next([
+        {
+          label: "New",
+          content: this.getQuotes(this.pipelineResults.newQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsTableOptions,
+          quoteCount: this.getQuoteCount(this.pipelineResults.newQuotes),
+        },
+        {
+          label: "Extension",
+          content: this.getQuotes(this.pipelineResults.extensionQuotes),
+          tableOptions: this.defaultTableOptions,
+          quoteTableOptions: this.quoteResultsExtensionTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.extensionQuotes
+          ),
+        },
+        {
+          label: "Awaiting Approval",
+          content: this.getQuotes(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+          tableOptions: this.approvalTableOptions,
+          quoteTableOptions: this.quoteResultsApprovalTableOptions,
+          quoteCount: this.getQuoteCount(
+            this.pipelineResults.awaitingApprovalQuotes
+          ),
+        },
+      ]);
+      this.lastUpdated = new Date();
+      this.overviewTabularDataNew = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.newQuotes
+      );
+      this.overviewTabularDataExtension = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.extensionQuotes
+      );
+      this.overviewTabularDataApproval = this.setUpLists(
+        this.pipelineResults.pipelineStatistics.awaitingApprovalQuotes
+      );
+    })
   }
+
+  //------------- Get pipeline Results--------------
+
+  // This will set up our subscription to the getPipelineResults API to poll for updated data
+   private openPollingForRefresh() {
+    this.pollingForRefresh$ = this.updPollingForRefresh$.asObservable().pipe(
+      switchMap<PipelineResults | null, Observable<PipelineResults>>(
+        (data: PipelineResults | null) => {
+          const pollingInterval = 30000;
+          const pollingStream$: Observable<PipelineResults> = pollingRequest(
+            this.pipelineService.getPipelineResults(),
+            pollingInterval
+          );
+          const delayedStream$ = timer(1, pollingInterval).pipe(
+            concatMapTo(pollingStream$)
+          );
+          return !!data
+            ? concat(of(data), delayedStream$)
+            : pollingStream$;
+        }
+      )
+    )
+    this.pollingForRefresh$.subscribe((data: PipelineResults) => {
+      this.loadPipelineResults(data);
+    })
+    
+    this.updPollingForRefresh$.next(null)
+   }
 
   // ApprovalHold
   onApprovalHoldClick(row) {
     this.pipelineService
       .getOpportunityDetails(row.opportunityId)
-      .subscribe((opportunityDetails: any) => {
+      .subscribe((opportunityDetails: PipelineOpportunityDetails) => {
         if (opportunityDetails.approvalHold) {
           const dialogConfiguration: StatusModalMeta = {
             iconClass: "mf warning",
@@ -218,12 +343,12 @@ export class PipelineDetailsComponent implements OnInit {
   postApprovalHoldRequest(opportunityId: number, approvalType: string) {
     this.pipelineService.approvalHold(opportunityId, approvalType).subscribe(
       (res: any) => {
-        //  this.notification.openSnackBar("success", res.message, 4000);
+        console.log("success", res.message, 4000);
         if (res) {
           this.getPipelineResults();
         }
-      }
-      // (error) => this.notification.openSnackBar("error", error, 4000)
+      },
+      (error) => console.log("error", error, 4000)
     );
   }
 
@@ -231,7 +356,7 @@ export class PipelineDetailsComponent implements OnInit {
   onClaim(row) {
     this.pipelineService
       .getOpportunityDetails(row.opportunityId)
-      .subscribe((opportunityDetails: any) => {
+      .subscribe((opportunityDetails: PipelineOpportunityDetails) => {
         if (opportunityDetails.claimedByUser) {
           const dialogConfiguration: StatusModalMeta = {
             iconClass: "mf warning",
@@ -271,17 +396,20 @@ export class PipelineDetailsComponent implements OnInit {
   claimQuotes(opportunityId: number, claimType: string) {
     this.pipelineService.claim(opportunityId, claimType).subscribe(
       (res: any) => {
-        // this.notification.openSnackBar("success", res.message, 4000);
+        console.log("success", res.message, 4000);
         if (res) {
           this.getPipelineResults();
         }
-      }
-      //(error) => this.notification.openSnackBar("error", error, 4000)
+      },
+      (error) => console.log("error", error, 4000)
     );
   }
 
   // This will handle setting up the table options
-  getTableOptions(pipelineColMetadata: any[], isQuoteOptions: boolean = false) {
+  getTableOptions(
+    pipelineColMetadata: DataComponent[],
+    isQuoteOptions: boolean = false
+  ) {
     if (!_.isEmpty(pipelineColMetadata)) {
       const options: TableOptions = this._mapPipelineOptions(
         pipelineColMetadata,
@@ -292,7 +420,10 @@ export class PipelineDetailsComponent implements OnInit {
   }
   // ------------------------------------------------------------
 
-  private _mapPipelineOptions(gridColMetadata: any[], isQuoteOptions) {
+  private _mapPipelineOptions(
+    gridColMetadata: DataComponent[],
+    isQuoteOptions
+  ) {
     const columns: TableColumn[] = isQuoteOptions
       ? this.mapQuoteResultsColumn(gridColMetadata)
       : this._mapColumns(gridColMetadata);
@@ -312,8 +443,8 @@ export class PipelineDetailsComponent implements OnInit {
     window.open(url, "_blank");
   }
 
-  private mapQuoteResultsColumn(colMetadata: any[]): TableColumn[] {
-    const columns: TableColumn[] = _.map(colMetadata, (dc: any) => {
+  private mapQuoteResultsColumn(colMetadata: DataComponent[]): TableColumn[] {
+    const columns: TableColumn[] = _.map(colMetadata, (dc: DataComponent) => {
       return {
         key: dc.dataMappingName,
         displayName: dc.name,
@@ -327,7 +458,7 @@ export class PipelineDetailsComponent implements OnInit {
         cellValueType: dc.dataValueType,
         cellTemplateClassName:
           dc.dataMappingName === "quoteId"
-            ? "mf-w-15"
+            ? "mf-w-10"
             : dc.dataMappingName === "opportunityUpbAmt"
             ? "mf-w-7"
             : dc.dataMappingName === "statusType"
@@ -343,8 +474,8 @@ export class PipelineDetailsComponent implements OnInit {
   }
 
   // This will handle mapping our DataComponent to a defined TableColumn definition
-  private _mapColumns(colMetadata: any[]): TableColumn[] {
-    const columns: TableColumn[] = _.map(colMetadata, (dc: any) => {
+  private _mapColumns(colMetadata: DataComponent[]): TableColumn[] {
+    const columns: TableColumn[] = _.map(colMetadata, (dc: DataComponent) => {
       return {
         key: dc.dataMappingName,
         displayName: _.toUpper(dc.name),
@@ -373,5 +504,31 @@ export class PipelineDetailsComponent implements OnInit {
       };
     });
     return columns;
+  }
+
+  // This will handle setting up the data to be passed to the instances of the TabularListComponent
+  setUpLists(keyData: QuoteStatistics): TabularListItem[] {
+    const overviewMetadata: DataComponent[] = _.clone(this.overviewMetadata);
+    const updMeta: DataComponent[] = _.map(
+      overviewMetadata,
+      (item: DataComponent) => {
+        item.value = keyData[item.dataMappingName];
+        return item;
+      }
+    );
+
+    const listData: TabularListItem[] = _.map(
+      updMeta,
+      (item: DataComponent) => {
+        return {
+          key: item.dataMappingName,
+          label: item.name,
+          value: item.value,
+          type: item.dataValueType,
+        };
+      }
+    );
+
+    return listData;
   }
 }
