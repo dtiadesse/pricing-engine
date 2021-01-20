@@ -1,219 +1,222 @@
-<ng-container *ngIf="(asyncTabs | async) !== null">
-    <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
-        <ng-container mf-card-title-group-action>
-            <div>
-                <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
-                    <mat-icon class="material-icons-outlined">refresh</mat-icon>
-                </button>
-                <span id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
-            </div>
-        </ng-container>
+<ng-container *ngIf="overviewTabularDataNew.length > 0">
+    <div class="row mx-0 mb-4">
+        <div class="col-lg-12 col-sm-12">
+            <shared-card [id]="'overViewCard'" [title]="'Overview'" [showContent]="overviewTabularDataNew.length > 0"
+                [isExpandable]="'true'">
+                <ng-container mf-card-content>
+                    <div class="row">
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">NEW</span>
+                            <mf-pe-tabular-list [id]="'overviewNewList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataNew">
+                            </mf-pe-tabular-list>
+                        </div>
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">EXTENSION</span>
+                            <mf-pe-tabular-list [id]="'overviewExtensionList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataExtension">
+                            </mf-pe-tabular-list>
+                        </div>
+                        <div class="col pb-2">
+                            <span class="mf body-small w600 mb-2 mx-3">AWAITING APPROVAL</span>
+                            <mf-pe-tabular-list [id]="'overviewApprovalList'" [rowsPerColumn]="8"
+                                [rowHeightStyle]="'highly-condensed'" [tabularData]="overviewTabularDataApproval">
+                            </mf-pe-tabular-list>
+                        </div>
+                    </div>
+                </ng-container>
+            </shared-card>
+        </div>
+    </div>
+</ng-container>
 
-        <ng-container mf-card-content>
-            <div class="row mx-0 ">
-                <div class="col px-0">
-                    <mat-tab-group class="mf-tab-group" animationDuration="0ms" color="primary" disableRipple="true">
-                        <mat-tab class="mf-tab-label mf darker" [id]="tab.label"
-                            *ngFor="let tab of (asyncTabs | async); let i = index">
-                            <ng-template mat-tab-label>{{ tab.label }} (O-{{ tab.content.length }},
-                                Q-{{tab.quoteCount}})
-                            </ng-template>
-                            <ng-template matTabContent>
-                                <div class="mt-4" *ngIf="tab.content?.length">
-                                    <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
-                                        [tableData]="tab.content" [tableOptions]="tab.tableOptions">
-                                        <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
-                                            <ng-container *ngIf="
-                                column.key === 'submitDateTime' ||
-                                  column.key === 'quoteCount' ||
-                                  column.key === 'opportunityId' ||
-                                  column.key === 'maxUPB';
-                                else: defaultCell
-                              ">
-                                                <ng-container *ngIf="row[column.key]; else: defaultCell">
-                                                    <div *ngIf="column.key === 'submitDateTime'" class="cell-value"
-                                                        [matTooltip]="row[column.key] | date: 'MM/dd/yyyy h:mm a'"
-                                                        [matTooltipClass]="'mf-tooltip'" mfPeShowTooltipIfTruncated>
-                                                        {{ row[column.key] | date: 'MM/dd h:mm a' }} </div>
-                                                    <div *ngIf="column.key === 'maxUPB'" class="cell-value"
-                                                        id="opportunity-{{row[column.key]}}"
-                                                        [matTooltip]="row[column.key] |currencySuffix : 2"
-                                                        [matTooltipClass]="'mf-tooltip'" mfPeShowTooltipIfTruncated>
-                                                        {{ row[column.key] | currencySuffix: 2 }} </div>
-                                                    <div *ngIf="column.key === 'opportunityId'" class="cell-value">
-                                                        <div class="row">
-                                                            <mat-icon *ngIf="row.quoteResults.length > 0"
-                                                                [id]="'pipelineResultsTableRow-' + row.opportunityId"
-                                                                class="mf-expansion-indicator mx-2" (click)="
-                                        pipelineResultsTable.expandedRow =
-                                          pipelineResultsTable.expandedRow === row ? null : row
-                                      " [@expansionIndicatorRotate]="
-                                        row == pipelineResultsTable.expandedRow
-                                          ? 'expanded'
-                                          : 'collapsed'
-                                      "> expand_more</mat-icon>
-                                                            <span class="mt-1" [matTooltip]="row.opportunityId"
-                                                                [matTooltipClass]="'mf-tooltip'"
-                                                                mfPeShowTooltipIfTruncated>{{ row.opportunityId}}
-                                                                ({{ row.quoteCount}})</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="cell-value action-button"
-                                                        *ngIf="column.key === 'quoteCount'">
-                                                        <div class="cell-value action-button"
-                                                            *ngIf="column.key === 'quoteCount'">
-                                                            <button class="mr-n2"
-                                                                [id]="'pipelineResultsMenuBtn-'+ index" mat-icon-button
-                                                                color="primary" [matMenuTriggerFor]="actionMenu"
-                                                                [matMenuTriggerData]="{ grid: 'output' }">
-                                                                <mat-icon>more_vert</mat-icon>
-                                                            </button>
-                                                            <mat-menu #actionMenu="matMenu" class="mf-contextual-menu">
-                                                                <ng-template matMenuContent>
-                                                                    <ng-container>
-                                                                        <button mat-menu-item
-                                                                            class="mf-contextual-menu-item"
-                                                                            (click)="onClaim(row)">
-                                                                            {{row.claimedByUserId !== currentUserId ? 'Claim' : 'Unclaim'}}
-                                                                        </button>
-                                                                        <button
-                                                                            *ngIf="tab.index == 2 && quotes.approvalLimit > row.maxUPB"
-                                                                            mat-menu-item
-                                                                            class="mf-contextual-menu-item"
-                                                                            (click)="onApprovalHoldClick(row)">
-                                                                            {{row.approvalHoldId !== currentUserId ? 'Place Approval Hold' : 'Release Approval Hold'}}
-                                                                        </button>
-                                                                    </ng-container>
-                                                                </ng-template>
-                                                            </mat-menu>
-                                                        </div>
-                                                    </div>
-                                                </ng-container>
-                                            </ng-container>
-                                            <ng-template #defaultCell>
-                                                <div class="cell-value mf" [ngClass]="{
-                                  right: column.cellValueType === 'currency_int',
-                                  'darker w600': column.key.includes('Name')
-                                }" [matTooltip]="row[column.key]" [matTooltipClass]="'mf-tooltip'"
-                                                    aria-label="Output Grid cell text that displays a tooltip when focused or hovered over"
-                                                    mfPeShowTooltipIfTruncated> {{
-                                  column.cellValueType === 'currency_int'
-                                    ? (row[column.key] | emptyValue: '0')
-                                    : (row[column.key] | emptyValue)
-                                }} </div>
-                                            </ng-template>
-                                        </ng-template>
-                                        <ng-template #masterDetailTemplate let-row="row" let-index="index">
-                                            <ng-container *ngIf="pipelineResultsTable.expandedRow !== null">
-                                                <mf-pe-table [id]="'quoteResultsTable-'+ index"
-                                                    [tableData]="row.expandedMasterDetail"
-                                                    [tableOptions]="tab.quoteTableOptions">
-                                                    <ng-template #cellTemplate let-row="row" let-column="column"
-                                                        let-index="index">
-                                                        <ng-container *ngIf="
-                                    column.key === 'opportunityUpbAmt' ||
-                                      column.key === 'submitDateTime' ||
-                                      column.key === 'priorityIndicator' ||
-                                      column.key === 'opportunityId' ||
-                                      column.key === 'quoteId';
-                                    else: defaultCell
-                                  ">
-                                                            <ng-container *ngIf="row[column.key]; else: defaultCell">
-                                                                <div *ngIf="column.key === 'quoteId'" class="row">
-                                                                    <ng-template #pipelineQuoteInfoTemplate>
-                                                                        <mat-card>
-                                                                            <div
-                                                                                class="mf-tabular-list-container container-fluid h-100">
-                                                                                <div class="mf-tabular-list-col">
-                                                                                    <mat-list role="list"
-                                                                                        class="mf-tabular-list mf-highly-condensed-rows">
-                                                                                        <mat-divider></mat-divider>
-                                                                                        <mat-list-item
-                                                                                            class="mf-tabular-list-item"
-                                                                                            role="listitem">
-                                                                                            <span
-                                                                                                id="previously-submitted-to-ho-label"
-                                                                                                class="mf-tabular-list-item-label mf body-small w600 darker"
-                                                                                                aria-label="Tabular list label text">Previously
-                                                                                                submitted to HO</span>
-                                                                                            <span
-                                                                                                id="previously-submitted-to-ho"
-                                                                                                class="mf-tabular-list-item-value mf body-small right px-5">
-                                                                                                {{ row.pricedBefore === 'Y' ? 'Yes' : 'No' }}
-                                                                                            </span>
-                                                                                        </mat-list-item>
-                                                                                        <mat-divider></mat-divider>
-                                                                                        <mat-list-item
-                                                                                            class="mf-tabular-list-item"
-                                                                                            role="listitem">
-                                                                                            <div mat-line>
-                                                                                                <span
-                                                                                                    id="producercomment-label"
-                                                                                                    class="mf-tabular-list-item-label mf body-small w600 darker"
-                                                                                                    aria-label="Tabular list label text">Producer's
-                                                                                                    comment:</span>
-                                                                                            </div>
-                                                                                            <div mat-line>
-                                                                                                <span
-                                                                                                    id="producercomment-label"
-                                                                                                    class="mf-tabular-list-item-value mf body-small"
-                                                                                                    aria-label="Tabular list label text">
-                                                                                                    {{row.requestHomeOfficeTriggerReasonText }}
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        </mat-list-item>
-                                                                                    </mat-list>
-                                                                                </div>
-                                                                            </div>
-                                                                        </mat-card>
-                                                                    </ng-template>
-                                                                    <mf-pe-custom-tooltip
-                                                                        [contentTemplate]="pipelineQuoteInfoTemplate">
-                                                                    </mf-pe-custom-tooltip>
-                                                                    <span class="cell-value mf-link mf-navigation-link"
-                                                                        id="quote-{{row[column.key]}}"
-                                                                        (click)="navigateTo(row[column.key])">
-                                                                        {{ row[column.key] }} </span>
+<ng-container *ngIf="(asyncTabs | async) !== null">
+    <div class="row mx-0 mb-4">
+        <div class="col-lg-12 col-sm-12">
+            <shared-card [id]="'pipelineTableCard'" [title]="'Pipeline'" [showContent]="(asyncTabs | async) !== null">
+                <ng-container mf-card-title-group-action>
+                    <div class="align-items-center col-sm-12">
+                        <mat-checkbox id="showMyQuotesChkbox" class="col-sm-4 mr-4 mf-remove-mb" name="showMyQuotesChkbox"
+                            color="primary" disableRipple="true" (change)="onShowMyQuoteChange($event)">Show my quotes
+                        </mat-checkbox>
+                        <mat-checkbox id="expandAllChkbox" class="col-sm-4 mr-3 mf-remove-mb" name="expandAllChkbox" color="primary"
+                            disableRipple="true" (change)="onExpandAllChkboxChange($event)" [checked]="allRowsExpanded">Expand
+                            all rows
+                        </mat-checkbox>
+                        <div class="align-items-center col-sm-4">
+                            <button mat-icon-button color="primary" id="refreshBtn" (click)="getPipelineResults()">
+                                <mat-icon class="material-icons-outlined">refresh</mat-icon>
+                            </button>
+                            <span id="lastUpdatedValue">Refreshed {{ lastUpdated | date: 'hh:mm:ss a' }}</span>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container mf-card-content>
+                    <div class="row mx-0 ">
+                        <div class="col-sm-12 col-lg-12 col-xs-12 px-0">
+                            <mat-tab-group class="mf-tab-group" animationDuration="0ms" color="primary" disableRipple="true">
+                                <mat-tab class="mf-tab-label mf darker" *ngFor="let tab of (asyncTabs | async); let i = index">
+                                    <ng-template mat-tab-label>{{ tab.label }} (O-{{ tab.content.length }},
+                                        Q-{{tab.quoteCount}})
+                                    </ng-template>
+                                    <ng-template matTabContent>
+                                        <div class="mt-4" *ngIf="tab.content?.length">
+                                            <mf-pe-table [id]="'pipelineResultsTableContent'" #pipelineResultsTable
+                                                [tableData]="tab.content" [expandAllRows]="allRowsExpanded"
+                                                [tableOptions]="tab.tableOptions"
+                                                [expandedRow]="pipelineResultsTableRef"
+                                                [expandedIndex]="expandedData"
+                                                >
+                                                <ng-template #cellTemplate let-row="row" let-column="column" let-index="index">
+                                                    <ng-container *ngIf="
+                                        column.key === 'submitDateTime' ||
+                                        column.key === 'quoteCount' ||
+                                        column.key === 'opportunityId' ||
+                                        column.key === 'maxUPB';
+                                        else: defaultCell
+                                    ">
+                                                        <ng-container *ngIf="row[column.key]; else: defaultCell">
+                                                            <div *ngIf="column.key === 'submitDateTime'" class="cell-value"
+                                                                [matTooltip]="row[column.key] | date: 'MM/dd/yyyy h:mm a'"
+                                                                [matTooltipClass]="'mf-tooltip'" mfPeShowTooltipIfTruncated>
+                                                                {{ row[column.key] | date: 'MM/dd h:mm a' }} </div>
+                                                            <div *ngIf="column.key === 'maxUPB'" class="cell-value"
+                                                                id="opportunity-{{row[column.key]}}"
+                                                                [matTooltip]="row[column.key] |currencySuffix : 2"
+                                                                [matTooltipClass]="'mf-tooltip'" mfPeShowTooltipIfTruncated>
+                                                                {{ row[column.key] | currencySuffix: 2 }} </div>
+                                                            <div *ngIf="column.key === 'opportunityId'" class="cell-value">
+                                                                <div class="row">
+                                                                    <mat-icon *ngIf="row.quoteResults.length > 0"
+                                                                        [id]="'pipelineResultsTableRow-' + row.opportunityId"
+                                                                        class="mf-expansion-indicator mx-2"
+                                                                        (click)="toggleContent(row, index)"
+                                                                        [@expansionIndicatorRotate]="
+                                        row == pipelineResultsTable.expandedRow || index == expandedData.expandedIndex ||  allRowsExpanded
+                                                ? 'expanded'
+                                                : 'collapsed'
+                                            "> expand_more</mat-icon>
+                                                                    <span class="mt-1" [matTooltip]="row.opportunityId"
+                                                                        [matTooltipClass]="'mf-tooltip'"
+                                                                        mfPeShowTooltipIfTruncated>{{ row.opportunityId}}
+                                                                        ({{ row.quoteCount}})</span>
                                                                 </div>
-                                                                <div *ngIf="column.key === 'submitDateTime'"
-                                                                    class="cell-value"
-                                                                    [matTooltip]="row[column.key] | date: 'MM/dd/yyyy h:mm a'"
-                                                                    [matTooltipClass]="'mf-tooltip'"
-                                                                    mfPeShowTooltipIfTruncated>
-                                                                    {{ row[column.key] | date: 'MM/dd h:mm a' }} </div>
-                                                                <span *ngIf="column.key === 'opportunityUpbAmt'"
-                                                                    class="cell-value"
-                                                                    id="opportunity-{{row[column.key]}}">
-                                                                    {{ row[column.key] | currencySuffix: 2 }}</span>
-                                                                <span *ngIf="column.key === 'priorityIndicator'"
-                                                                    class="cell-value"
-                                                                    [ngStyle]="{'color':row[column.key] === 'N' ? '' : '#1AB3DA' }"
-                                                                    [matTooltip]="row.priorityIndicator"
-                                                                    [matTooltipClass]="'mf-tooltip'"
-                                                                    mfPeShowTooltipIfTruncated>
-                                                                    {{ row[column.key] === 'Y' ? 'Yes' : 'No' }} </span>
-                                                            </ng-container>
+                                                            </div>
+                                                            <div class="cell-value action-button"
+                                                                *ngIf="column.key === 'quoteCount'">
+                                                                <div class="cell-value action-button"
+                                                                    *ngIf="column.key === 'quoteCount'">
+                                                                    <button class="mr-n2"
+                                                                        [id]="'pipelineResultsMenuBtn-'+ index" mat-icon-button
+                                                                        color="primary" [matMenuTriggerFor]="actionMenu"
+                                                                        [matMenuTriggerData]="{ grid: 'output' }">
+                                                                        <mat-icon>more_vert</mat-icon>
+                                                                    </button>
+                                                                    <mat-menu #actionMenu="matMenu" class="mf-contextual-menu">
+                                                                        <ng-template matMenuContent>
+                                                                            <ng-container>
+                                                                                <button mat-menu-item
+                                                                                    class="mf-contextual-menu-item"
+                                                                                    (click)="onClaim(row)">
+                                                                                    {{row.claimedByUserId !== currentUserId ? 'Claim' : 'Unclaim'}}
+                                                                                </button>
+                                                                                <button
+                                                                                    *ngIf="(tab.label == 'Awaiting Approval') && pipelineResults.approvalLimit > row.maxUPB"
+                                                                                    mat-menu-item
+                                                                                    class="mf-contextual-menu-item"
+                                                                                    (click)="onApprovalHoldClick(row)">
+                                                                                    {{row.approvalHoldId !== currentUserId ? 'Place Approval Hold' : 'Release Approval Hold'}}
+                                                                                </button>
+                                                                            </ng-container>
+                                                                        </ng-template>
+                                                                    </mat-menu>
+                                                                </div>
+                                                            </div>
                                                         </ng-container>
-                                                        <ng-template #defaultCell>
-                                                            <div class="cell-value mf" [matTooltip]="row[column.key]"
-                                                                [matTooltipClass]="'mf-tooltip'"
-                                                                aria-label="default cell text that displays a tooltip when focused or hovered over"
-                                                                mfPeShowTooltipIfTruncated> {{
-                                      
-                                        (row[column.key] | emptyValue)
-                                    }} </div>
-                                                        </ng-template>
+                                                    </ng-container>
+                                                    <ng-template #defaultCell>
+                                                        <div class="cell-value mf" [ngClass]="{
+                                        right: column.cellValueType === 'currency_int',
+                                        'darker w600': column.key.includes('Name')
+                                        }" [matTooltip]="row[column.key]" [matTooltipClass]="'mf-tooltip'"
+                                                            aria-label="Output Grid cell text that displays a tooltip when focused or hovered over"
+                                                            mfPeShowTooltipIfTruncated> {{
+                                        column.cellValueType === 'currency_int'
+                                            ? (row[column.key] | emptyValue: '0')
+                                            : (row[column.key] | emptyValue)
+                                        }} </div>
                                                     </ng-template>
-                                                </mf-pe-table>
-                                            </ng-container>
-                                        </ng-template>
-                                    </mf-pe-table>
-                                </div>
-                            </ng-template>
-                        </mat-tab>
-                    </mat-tab-group>
-                </div>
-            </div>
-        </ng-container>
-    </shared-card>
+                                                </ng-template>
+                                                <ng-template #masterDetailTemplate let-row="row" let-index="index">
+                                                    <ng-container
+                                                        *ngIf="(pipelineResultsTable.expandedRow !== null )|| allRowsExpanded ">
+                                                        <mf-pe-table [id]="'quoteResultsTable-'+ index"
+                                                            [tableData]="row.expandedMasterDetail"
+                                                            [tableOptions]="tab.quoteTableOptions"
+                                                            [expandedIndex]="expandedData"
+                                                            pipelineResultsTableRef="pipelineResultsTableRef"
+                                                            >
+                                                            <ng-template #cellTemplate let-row="row" let-column="column"
+                                                                let-index="index">
+                                                                <ng-container *ngIf="
+                                            column.key === 'opportunityUpbAmt' ||
+                                            column.key === 'submitDateTime' ||
+                                            column.key === 'priorityIndicator' ||
+                                            column.key === 'opportunityId' ||
+                                            column.key === 'quoteId';
+                                            else: defaultCell
+                                        ">
+                                                                    <ng-container *ngIf="row[column.key]; else: defaultCell">
+                                                                        <span *ngIf="column.key === 'quoteId'"
+                                                                            class="cell-value mf-link mf-navigation-link"
+                                                                            id="quote-{{row[column.key]}}"
+                                                                            (click)="navigateTo(row[column.key])">
+                                                                            {{ row[column.key] }} </span>
+                                                                        <div *ngIf="column.key === 'submitDateTime'"
+                                                                            class="cell-value"
+                                                                            [matTooltip]="row[column.key] | date: 'MM/dd/yyyy h:mm a'"
+                                                                            [matTooltipClass]="'mf-tooltip'"
+                                                                            mfPeShowTooltipIfTruncated>
+                                                                            {{ row[column.key] | date: 'MM/dd h:mm a' }} </div>
+                                                                        <span *ngIf="column.key === 'opportunityUpbAmt'"
+                                                                            class="cell-value"
+                                                                            id="opportunity-{{row[column.key]}}">
+                                                                            {{ row[column.key] | currencySuffix: 2 }}</span>
+                                                                        <span *ngIf="column.key === 'priorityIndicator'"
+                                                                            class="cell-value"
+                                                                            [ngStyle]="{'color':row[column.key] === 'N' ? '' : '#1AB3DA' }"
+                                                                            [matTooltip]="row.priorityIndicator"
+                                                                            [matTooltipClass]="'mf-tooltip'"
+                                                                            mfPeShowTooltipIfTruncated>
+                                                                            {{ row[column.key] === 'Y' ? 'Yes' : 'No' }} </span>
+                                                                    </ng-container>
+                                                                </ng-container>
+                                                                <ng-template #defaultCell>
+                                                                    <div class="cell-value mf" [ngClass]="{
+                                            right: column.cellValueType === 'currency_int',
+                                            'darker w600': column.key.includes('Name')
+                                            }" [matTooltip]="row[column.key]" [matTooltipClass]="'mf-tooltip'"
+                                                                        aria-label="Output Grid cell text that displays a tooltip when focused or hovered over"
+                                                                        mfPeShowTooltipIfTruncated> {{
+                                            column.cellValueType === 'currency_int'
+                                                ? (row[column.key] | emptyValue: '0')
+                                                : (row[column.key] | emptyValue)
+                                            }} </div>
+                                                                </ng-template>
+                                                            </ng-template>
+                                                        </mf-pe-table>
+                                                    </ng-container>
+                                                </ng-template>
+                                            </mf-pe-table>
+                                        </div>
+                                    </ng-template>
+                                </mat-tab>
+                            </mat-tab-group>
+                        </div>
+                    </div>
+                </ng-container>
+            </shared-card>
+        </div>
+    </div>
 </ng-container>

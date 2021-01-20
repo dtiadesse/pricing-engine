@@ -27,6 +27,7 @@ import { StatusDialogComponent } from "../shared/components/status-modal/status.
 import { PipelineDetailsComponent } from "./pipeline-details/pipeline-details.component";
 import { MatCardModule } from "@angular/material/card";
 import { PricingEngineSharedModule } from "../shared/pricing-engine-shared.module";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 @NgModule({
   declarations: [PipelineDetailsComponent],
   imports: [
@@ -40,6 +41,7 @@ import { PricingEngineSharedModule } from "../shared/pricing-engine-shared.modul
     MatMenuModule,
     MatSnackBarModule,
     MatTabsModule,
+    MatCheckboxModule,
     MatTooltipModule,
     ModalModule,
     MatListModule,

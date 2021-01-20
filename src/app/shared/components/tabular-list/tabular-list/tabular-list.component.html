@@ -8,7 +8,7 @@
                 <ng-container *ngFor="let item of group">
                     <mat-list-item *ngIf="item.type !== 'status'" class="mf-tabular-list-item" role="listitem">
                         <span id="{{item.key}}Label"
-                            class="mf-tabular-list-item-label mf body-small w600 darker">{{ item.label }}</span>
+                            class="mf-tabular-list-item-label mf body-small w600 darker"> <mat-icon class="mf-icon-medium" >{{rowIcon}}</mat-icon> {{ item.label }}</span>
                         <span id="{{item.key}}Value" class="mf-tabular-list-item-value mf body-small right"> {{
                 (item.value != null && item.value !== '' && item.type.includes('date'))
                   ? (item.value | date:'M/d/yy h:mm a')
